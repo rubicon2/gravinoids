@@ -1,0 +1,23 @@
+:root {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(0, 24, 56);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#renderCanvas {
+    width: inherit;
+    height: inherit;
+}
