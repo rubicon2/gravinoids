@@ -148,29 +148,24 @@ function renderPlayerDebug(player) {
 
     let pos = player.t.position;
     let f = player.t.forward();
-
     let v = player.rb.velocity;
 
     ctx.strokeStyle = debugPlayerColor;
     ctx.fillStyle = debugPlayerColor;
     ctx.font = "24px Arial";
 
-    ctx.save(); 
-
     // Draw forward direction.
-    ctx.translate(pos.x, pos.y);
-    ctx.lineTo(f.x * 20, f.y * 20);
+    ctx.moveTo(pos.x, pos.y);
+    ctx.lineTo(pos.x + f.x * 75, pos.y + f.y * 75);
     ctx.stroke();
 
-    // Draw radius.
-    ctx.beginPath();
-    ctx.arc(0, 0, 30, 0, 2 * Math.PI);
-    ctx.stroke();
+    ctx.save(); 
+    ctx.translate(pos.x, pos.y);
     
     // Debug text. 
-    ctx.fillText(`pos: ${roundTo(pos.x, 2)}, ${roundTo(pos.y, 2)}`, 40, -30);
+    ctx.fillText(`pos: ${roundTo(pos.x, 0)}, ${roundTo(pos.y, 0)}`, 40, -30);
     ctx.fillText(`rot: ${roundTo(player.t.rotation, 0)}`, 40, 0);
-    ctx.fillText(`f: ${roundTo(f.x, 4)}, ${roundTo(f.y, 4)}`, 40, 30);
+    ctx.fillText(`f: ${roundTo(f.x, 2)}, ${roundTo(f.y, 2)}`, 40, 30);
     ctx.fillText(`v: ${roundTo(v.x, 2)}, ${roundTo(v.y, 2)}`, 40, 60);
     ctx.fillText(`rs: ${roundTo(player.rb.rotationSpeed, 2)}`, 40, 90);
 
