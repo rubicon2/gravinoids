@@ -5,6 +5,16 @@ function createVector2(x, y) {
     }
 }
 
+function rotateVector2(v, deg) {
+    let cos = Math.cos(degToRad(deg));
+    let sin = Math.sin(degToRad(deg));
+    return createVector2(cos * v.x + -sin * v.y, sin * v.x + cos * v.y);
+}
+
+function multiplyVector2(v, s) {
+    return createVector2(v.x * s, v.y * s);
+}
+
 function addVector2(v1, v2) {
     return createVector2(v1.x + v2.x, v1.y + v2.y);
 }

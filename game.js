@@ -6,29 +6,52 @@ const center = createVector2(canvas.clientWidth / 2, canvas.clientHeight / 2);
 let players = [];
 let rigidbodies = [];
 
-function calculateForward(transform) {
-    // How to do that? 
-    // Use transform's rotation to create a vector direction.
-    // 0 = up
-    // 90 = right
-    // 180 = down
-    // 270 = left 
-    // Generate a unit vector representing the direction. 
-}
+let debug = true;
+let debugPlayerColor = "white";
+
+let defaultKeys = [
+    {
+        up: "KeyW",
+        left: "KeyA",
+        down: "KeyS",
+        right: "KeyD",
+        action: "KeyE"
+    },
+    {
+        up: "ArrowUp",
+        left: "ArrowLeft",
+        down: "ArrowDown",
+        right: "ArrowRight",
+        action: "ShiftRight"       
+    }
+]
+
+let ships = [
+    [
+        createVector2(-12, 12),
+        createVector2(-6, -10),
+        createVector2(0, -20),
+        createVector2(6, -10),
+        createVector2(12, 12),
+        createVector2(0, 0)
+    ]
+]
 
 function createTransform(x, y) {
     return t = { 
         position: createVector2(x, y),
         rotation: 0,
-        forward: createVector2(0, 0) 
+        forward() {
+            return rotateVector2(createVector2(0, -1), this.rotation);
+        }
     };
 }
 
-function createRigidbody(vx, vy, ax, ay, rot) {
+function createRigidbody() {
     let rb = {
-        velocity: createVector2(vx, vy),
-        rotationSpeed: rot,
-        acceleration: createVector2(ax, ay),
+        velocity: createVector2(0, 0),
+        rotationSpeed: 0,
+        acceleration: createVector2(0, 0),
         mass: 0, 
         bounciness: 0
     }
@@ -37,16 +60,11 @@ function createRigidbody(vx, vy, ax, ay, rot) {
     return rb;
 }
 
-function createPlayer(color, x, y, ax, ay, rotationSpeed) {
+function createPlayer(color, x, y) {
     let newPlayer = {
         t: createTransform(x, y),
-        rb: createRigidbody(0, 0, ax, ay, rotationSpeed),
-        model: [createVector2(-12, -12),
-                createVector2(-6, 10),
-                createVector2(0, 20),
-                createVector2(6, 10),
-                createVector2(12, -12),
-                createVector2(0, 0)],
+        rb: createRigidbody(),
+        model: ships[0],
         color: color
     }
     return newPlayer;
@@ -67,11 +85,14 @@ function processRbs() {
 }
 
 function updatePosition(player) {
-    player.rb.velocity.x += player.rb.acceleration.x;
-    player.rb.velocity.y += player.rb.acceleration.y;
-    player.t.position.x += player.rb.velocity.x;
-    player.t.position.y += player.rb.velocity.y;
+    player.rb.velocity = addVector2(player.rb.velocity, player.rb.acceleration);
+    player.t.position = addVector2(player.t.position, player.rb.velocity);
     player.t.rotation = (player.t.rotation + player.rb.rotationSpeed) % 360;
+    // Although modulus should only ever return POSITIVE NUMBERS as far as I am concerned, in JS it does not.
+    // So, after % 360, this should never be any less than -360. Add 360 to neg angle, so angle range is 0 - 360 degrees.
+    if (player.t.rotation < 0) {
+        player.t.rotation += 360;
+    }
 }
 
 function updatePositions() {
@@ -81,16 +102,19 @@ function updatePositions() {
 }
 
 function createPlayers(playerCount) {
-    // for(let i = 0; i < playerCount; i++) {
-    //     let newPlayer = createPlayer();
-    // }
-
+    playerCount = Math.min(playerCount, 4);
     players = [];
-
-    players.push(createPlayer("red", center.x * 0.5, center.y, 0, 0, 1));
-    players.push(createPlayer("blue", center.x * 1.5, center.y, 0, 0, 2));
-    // players.push(createPlayer("green"));
-    // players.push(createPlayer("yellow"));
+    // Not using break on purpose so it cascades down each case. 
+    switch(playerCount) {
+        case 4:
+            players.push(createPlayer("green", center.x * 0.5, center.y * 0.5));
+        case 3:
+            players.push(createPlayer("blue", center.x * 1.5, center.y * 1.5));
+        case 2:
+            players.push(createPlayer("red", center.x * 1.5, center.y * 0.5));
+        default:
+            players.push(createPlayer("yellow", center.x * 0.5, center.y * 1.5));
+    }
 }
 
 function initialiseGameData(playerCount) {
@@ -99,22 +123,15 @@ function initialiseGameData(playerCount) {
 
 function renderPlayer(player) {
 
-    ctx.fillStyle = player.color;
     let pos = player.t.position;
     let model = player.model;
 
     ctx.save();
     ctx.translate(pos.x, pos.y);
-    ctx.rotate(player.t.rotation * Math.PI / 180);
+    ctx.rotate(degToRad(player.t.rotation));
+    ctx.fillStyle = player.color;
 
     ctx.beginPath();
-    // ctx.moveTo(pos.x + player.model[0].x * scale, pos.y + player.model[0].y * scale);
-    // for(let i = 1; i < player.model.length; i++) {
-    //     let v = model[i];
-    //     let x = pos.x + v.x * scale;
-    //     let y = pos.y + v.y * scale;
-    //     ctx.lineTo(x, y);
-    // }
     ctx.moveTo(player.model[0].x * scale, player.model[0].y * scale);
     for(let i = 1; i < player.model.length; i++) {
         let v = model[i];
@@ -124,6 +141,38 @@ function renderPlayer(player) {
     }
     ctx.closePath();
     ctx.fill();
+    ctx.restore();
+}
+
+function renderPlayerDebug(player) {
+
+    let pos = player.t.position;
+    let f = player.t.forward();
+
+    let v = player.rb.velocity;
+
+    ctx.strokeStyle = debugPlayerColor;
+    ctx.fillStyle = debugPlayerColor;
+    ctx.font = "24px Arial";
+
+    ctx.save(); 
+
+    // Draw forward direction.
+    ctx.translate(pos.x, pos.y);
+    ctx.lineTo(f.x * 20, f.y * 20);
+    ctx.stroke();
+
+    // Draw radius.
+    ctx.beginPath();
+    ctx.arc(0, 0, 30, 0, 2 * Math.PI);
+    ctx.stroke();
+    
+    // Debug text. 
+    ctx.fillText(`pos: ${roundTo(pos.x, 2)}, ${roundTo(pos.y, 2)}`, 40, -30);
+    ctx.fillText(`rot: ${roundTo(player.t.rotation, 0)}`, 40, 0);
+    ctx.fillText(`f: ${roundTo(f.x, 4)}, ${roundTo(f.y, 4)}`, 40, 30);
+    ctx.fillText(`v: ${roundTo(v.x, 2)}, ${roundTo(v.y, 2)}`, 40, 60);
+    ctx.fillText(`rs: ${roundTo(player.rb.rotationSpeed, 2)}`, 40, 90);
 
     ctx.restore();
 }
@@ -135,6 +184,12 @@ function renderScene() {
     for(let player of players) {
         renderPlayer(player);
     }
+
+    if(debug) {
+        for(let player of players) {
+            renderPlayerDebug(player);
+        }
+    }
 }
 
 function tick() {
@@ -144,7 +199,7 @@ function tick() {
 }
 
 window.addEventListener("keypress", processKey);
-initialiseGameData(1);
+initialiseGameData(2);
 requestAnimationFrame(tick);
 // randomiseVector(players[0].rb.velocity, -1, 1);
 

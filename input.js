@@ -1,16 +1,16 @@
 function processKey(e) {
-    switch(e.key) {
-        case "w":
+    switch(e.code) {
+        case "KeyW":
             players[0].rb.velocity.y -= 0.2;
             break;
-        case "s":
+        case "KeyS":
             players[0].rb.velocity.y += 0.2;
             break;
-        case "a":
-            players[0].rb.velocity.x -= 0.2;
+        case "KeyA":
+            players[0].rb.rotationSpeed -= 0.2;
             break;
-        case "d":
-            players[0].rb.velocity.x += 0.2;
+        case "KeyD":
+            players[0].rb.rotationSpeed += 0.2;
             break;
     }
 }

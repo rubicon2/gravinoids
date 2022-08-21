@@ -12,6 +12,13 @@ function randomiseVector(v, min, max) {
     v.y = getRangedRandom(min, max);
 }
 
+function roundTo(float, digits) {
+    digits = Math.pow(10, digits);
+    float *= digits;
+    float = Math.round(float);
+    return float /= digits;
+}
+
 function shuffleArray(array) {
 
     let copy = array.slice();
@@ -24,4 +31,8 @@ function shuffleArray(array) {
     }
 
     return shuffled;
+}
+
+function degToRad(deg) {
+    return deg * Math.PI / 180;
 }
