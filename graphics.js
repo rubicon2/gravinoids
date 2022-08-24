@@ -6,11 +6,21 @@ function setCanvasSize(canvas, context, scale, width, height) {
     context.scale(scale, scale);
 }
 
-function createTri(va, vb, vc, color) {
+function createTri(v1, v2, v3, color) {
     return {
-        v1: va,
-        v2: vb,
-        v3: vc,
-        c: color
+        v1: v1,
+        v2: v2,
+        v3: v3,
+        color: color
     }
+}
+
+function drawTri(tri, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(tri.v1.x * scale, tri.v1.y * scale);
+    ctx.lineTo(tri.v2.x * scale, tri.v2.y * scale);
+    ctx.lineTo(tri.v3.x * scale, tri.v3.y * scale);
+    ctx.closePath();
+    ctx.fill();
 }

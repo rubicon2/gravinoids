@@ -3,7 +3,13 @@ const ctx = canvas.getContext("2d");
 const scale = window.devicePixelRatio;
 const center = createVector2(canvas.clientWidth / 2, canvas.clientHeight / 2); 
 
+const maxAcceleration = 5;
+const accelerationSpeed = 0.2;
+const brakingSpeed = 0.5;
+const turningSpeed = 0.2;
+
 let players = [];
+let stars = [];
 let rigidbodies = [];
 
 let debug = true;
@@ -26,16 +32,39 @@ let defaultKeys = [
     }
 ]
 
+// let ships = [
+//     [
+//         createVector2(-12, 12),
+//         createVector2(-6, -10),
+//         createVector2(0, -20),
+//         createVector2(6, -10),
+//         createVector2(12, 12),
+//         createVector2(0, 0)
+//     ]
+// ]
+
 let ships = [
+    // Ship 1...
     [
-        createVector2(-12, 12),
-        createVector2(-6, -10),
-        createVector2(0, -20),
-        createVector2(6, -10),
-        createVector2(12, 12),
-        createVector2(0, 0)
+        createTri(createVector2(-12, 12), createVector2(-6, -10), createVector2(0, 0), "yellow"),
+        createTri(createVector2(0, 0), createVector2(6, -10), createVector2(12, 12), "red"),
+        createTri(createVector2(-6, -10), createVector2(6, -10), createVector2(0, 0), "green"),
+        createTri(createVector2(-6, -10), createVector2(6, -10), createVector2(0, -20), "blue")
     ]
+    // Ship 2, etc.
 ]
+
+function createRGBA(r, g, b, a) {
+    return rgba = {
+        r: r,
+        g: g,
+        b: b,
+        a: a,
+        getString() {
+            return `rgba(${r}, ${g}, ${b}, ${a})`;
+        }
+    }
+}
 
 function createTransform(x, y) {
     return t = { 
@@ -47,27 +76,63 @@ function createTransform(x, y) {
     };
 }
 
-function createRigidbody() {
+function createRigidbody(transform, collisionEnabled) {
     let rb = {
+        transform: transform,
         velocity: createVector2(0, 0),
         rotationSpeed: 0,
         acceleration: createVector2(0, 0),
         mass: 0, 
-        bounciness: 0
+        bounciness: 0,
+        collisionEnabled: collisionEnabled,
+        update() {
+            this.velocity = addVector2(this.velocity, this.acceleration);
+            this.transform.position = addVector2(this.transform.position, this.velocity);
+            this.transform.rotation = (this.transform.rotation + this.rotationSpeed) % 360;
+            if (this.transform.rotation < 0) {
+                this.transform.rotation += 360;
+            }
+        }
     }
     // To ensure a rigibody is not created without being added to the list for processing, do it here. 
     rigidbodies.push(rb);
     return rb;
 }
 
-function createPlayer(color, x, y) {
-    let newPlayer = {
+function createStar(x, y, model, colorA, colorB) {
+    return newStar = {
         t: createTransform(x, y),
-        rb: createRigidbody(),
-        model: ships[0],
-        color: color
+        rb: createRigidbody(t, false),
+        model: model,
+        colorA: colorA,
+        colorB: colorB
     }
-    return newPlayer;
+}
+
+function createPlayer(color, x, y, keybindings) {
+    return newPlayer = {
+        t: createTransform(x, y),
+        rb: createRigidbody(t, true),
+        model: ships[0],
+        color: color,
+        keys: keybindings,
+
+        accelerate(speed) {
+            this.rb.velocity = addVector2(this.rb.velocity, rotateVector2(createVector2(0, -speed), this.t.rotation));
+        },
+
+        decelerate(speed) {
+            this.rb.velocity = addVector2(this.rb.velocity, rotateVector2(createVector2(0, speed), this.t.rotation));
+        },
+
+        turn(speed) {
+            this.rb.rotationSpeed += speed;
+        },
+
+        action() {
+            // Do something!
+        }
+    }
 }
 
 function processRbs() {
@@ -84,20 +149,9 @@ function processRbs() {
      */
 }
 
-function updatePosition(player) {
-    player.rb.velocity = addVector2(player.rb.velocity, player.rb.acceleration);
-    player.t.position = addVector2(player.t.position, player.rb.velocity);
-    player.t.rotation = (player.t.rotation + player.rb.rotationSpeed) % 360;
-    // Although modulus should only ever return POSITIVE NUMBERS as far as I am concerned, in JS it does not.
-    // So, after % 360, this should never be any less than -360. Add 360 to neg angle, so angle range is 0 - 360 degrees.
-    if (player.t.rotation < 0) {
-        player.t.rotation += 360;
-    }
-}
-
-function updatePositions() {
-    for (let i = 0; i < players.length; i++) {
-        updatePosition(players[i]);
+function update() {
+    for(let rb of rigidbodies) {
+        rb.update();
     }
 }
 
@@ -107,13 +161,13 @@ function createPlayers(playerCount) {
     // Not using break on purpose so it cascades down each case. 
     switch(playerCount) {
         case 4:
-            players.push(createPlayer("green", center.x * 0.5, center.y * 0.5));
+            players.push(createPlayer(createRGBA(0, 255, 0, 1), center.x * 0.5, center.y * 0.5, defaultKeys[3]));
         case 3:
-            players.push(createPlayer("blue", center.x * 1.5, center.y * 1.5));
+            players.push(createPlayer(createRGBA(0, 0, 255, 1), center.x * 1.5, center.y * 1.5, defaultKeys[2]));
         case 2:
-            players.push(createPlayer("red", center.x * 1.5, center.y * 0.5));
+            players.push(createPlayer(createRGBA(255, 0, 0, 1), center.x * 1.5, center.y * 0.5, defaultKeys[1]));
         default:
-            players.push(createPlayer("yellow", center.x * 0.5, center.y * 1.5));
+            players.push(createPlayer(createRGBA(255, 0, 255, 1), center.x * 0.5, center.y * 1.5, defaultKeys[0]));
     }
 }
 
@@ -129,18 +183,16 @@ function renderPlayer(player) {
     ctx.save();
     ctx.translate(pos.x, pos.y);
     ctx.rotate(degToRad(player.t.rotation));
-    ctx.fillStyle = player.color;
 
-    ctx.beginPath();
-    ctx.moveTo(player.model[0].x * scale, player.model[0].y * scale);
-    for(let i = 1; i < player.model.length; i++) {
-        let v = model[i];
-        let x = v.x * scale;
-        let y = v.y * scale;
-        ctx.lineTo(x, y);
+    let cos = Math.max(Math.cos(degToRad(player.t.rotation)), 0.45);
+    let sin = Math.max(Math.sin(degToRad(player.t.rotation)), 0.45);
+    let c = player.color;
+
+    for(let tri of player.model) {
+        let color = `rgb(${cos * c.r + sin * c.r}, ${cos * c.g + -sin * c.g}, ${cos * c.b + sin * c.b}, 1)`;
+        drawTri(tri, color);
     }
-    ctx.closePath();
-    ctx.fill();
+
     ctx.restore();
 }
 
@@ -155,8 +207,10 @@ function renderPlayerDebug(player) {
     ctx.font = "24px Arial";
 
     // Draw forward direction.
+    ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
     ctx.lineTo(pos.x + f.x * 75, pos.y + f.y * 75);
+    ctx.closePath();
     ctx.stroke();
 
     ctx.save(); 
@@ -188,20 +242,11 @@ function renderScene() {
 }
 
 function tick() {
-    updatePositions();
+    update();
     renderScene();
     requestAnimationFrame(tick);
 }
 
-window.addEventListener("keypress", processKey);
+window.addEventListener("keydown", processKey);
 initialiseGameData(2);
 requestAnimationFrame(tick);
-// randomiseVector(players[0].rb.velocity, -1, 1);
-
-// Get input 
-
-// Process input 
-
-// Run physics and collision detection
-
-// Display on cavas
