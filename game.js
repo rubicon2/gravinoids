@@ -43,7 +43,7 @@ let defaultKeys = [
 //     ]
 // ]
 
-let ships = [
+let shipModels = [
     // Ship 1...
     [
         createTri(createVector2(-12, 12), createVector2(-6, -10), createVector2(0, 0), "yellow"),
@@ -54,13 +54,19 @@ let ships = [
     // Ship 2, etc.
 ]
 
+let starModels = [
+    [
+        createTri(createVector2(-1, -1), createVector2(1, -1), createVector2(0, 1))
+    ]
+]
+
 function createRGBA(r, g, b, a) {
     return rgba = {
         r: r,
         g: g,
         b: b,
         a: a,
-        getString() {
+        toString() {
             return `rgba(${r}, ${g}, ${b}, ${a})`;
         }
     }
@@ -113,7 +119,7 @@ function createPlayer(color, x, y, keybindings) {
     return newPlayer = {
         t: createTransform(x, y),
         rb: createRigidbody(t, true),
-        model: ships[0],
+        model: shipModels[0],
         color: color,
         keys: keybindings,
 
@@ -135,23 +141,20 @@ function createPlayer(color, x, y, keybindings) {
     }
 }
 
-function processRbs() {
-    for(let rb in rigidbodies) {
-        for (let other in rigidbodies) {
-            if (other === rb) continue;
-            // Need more info (i.e. bounding box) to check overlaps. Not just position! Duhhh.
-            
-        }
-    }
-
-    /* Newtonian Gravity
-     * Smaller object acceleration = (G * Bigger object mass) / sqr(distance)
-     */
-}
-
 function update() {
     for(let rb of rigidbodies) {
         rb.update();
+    }
+}
+
+function createStars(starCount) {
+    for(let i = 0; i < starCount; i++) {
+        let x = canvas.clientWidth * Math.random();
+        let y = canvas.clientHeight * Math.random();
+        let s = createStar(x, y, starModels[0], createRGBA(255 * Math.random(), 255 * Math.random(), 255, 1), createRGBA(255, 0, 0, 1));
+        s.rb.velocity = createVector2((Math.random() * 2 - 1) * 0.01, (Math.random() * 2 - 1) * 0.01);
+        s.rb.rotationSpeed = Math.random();
+        stars.push(s);
     }
 }
 
@@ -175,10 +178,24 @@ function initialiseGameData(playerCount) {
     createPlayers(playerCount); 
 }
 
+function renderStar(star) {
+    let pos = star.t.position;
+
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+    ctx.rotate(degToRad(star.t.rotation));
+
+    for(let tri of star.model) {
+        let color = star.colorA.toString();
+        drawTri(tri, color);
+    }
+
+    ctx.restore();
+}
+
 function renderPlayer(player) {
 
     let pos = player.t.position;
-    let model = player.model;
 
     ctx.save();
     ctx.translate(pos.x, pos.y);
@@ -230,6 +247,10 @@ function renderScene() {
     setCanvasSize(canvas, ctx, scale, canvas.clientWidth, canvas.clientHeight);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     
+    for(let star of stars) {
+        renderStar(star);
+    }
+
     for(let player of players) {
         renderPlayer(player);
     }
@@ -249,4 +270,5 @@ function tick() {
 
 window.addEventListener("keydown", processKey);
 initialiseGameData(2);
+createStars(100);
 requestAnimationFrame(tick);
