@@ -1,7 +1,7 @@
 const canvas = document.querySelector("#renderCanvas");
 const ctx = canvas.getContext("2d");
 const scale = window.devicePixelRatio;
-const center = createVector2(canvas.clientWidth / 2, canvas.clientHeight / 2); 
+const center = V2.create(canvas.clientWidth / 2, canvas.clientHeight / 2); 
 
 const maxAcceleration = 5;
 const accelerationSpeed = 0.2;
@@ -14,6 +14,8 @@ let rigidbodies = [];
 
 let debug = true;
 let debugPlayerColor = "white";
+let timeToRender = 0;
+let fps = 0;
 
 let defaultKeys = [
     {
@@ -32,31 +34,18 @@ let defaultKeys = [
     }
 ]
 
-// let ships = [
-//     [
-//         createVector2(-12, 12),
-//         createVector2(-6, -10),
-//         createVector2(0, -20),
-//         createVector2(6, -10),
-//         createVector2(12, 12),
-//         createVector2(0, 0)
-//     ]
-// ]
-
 let shipModels = [
     // Ship 1...
     [
-        createTri(createVector2(-12, 12), createVector2(-6, -10), createVector2(0, 0), "yellow"),
-        createTri(createVector2(0, 0), createVector2(6, -10), createVector2(12, 12), "red"),
-        createTri(createVector2(-6, -10), createVector2(6, -10), createVector2(0, 0), "green"),
-        createTri(createVector2(-6, -10), createVector2(6, -10), createVector2(0, -20), "blue")
-    ]
+        createTri(V2.create(-12, 12), V2.create(-6, -10), V2.create(0, 0), "yellow"),
+        createTri(V2.create(0, 0), V2.create(6, -10), V2.create(12, 12), "red"),
+        createTri(V2.create(-6, -10), V2.create(6, -10), V2.create(0, 0), "green"),
+        createTri(V2.create(-6, -10), V2.create(6, -10), V2.create(0, -20), "blue")
+    ],
     // Ship 2, etc.
-]
-
-let starModels = [
     [
-        createTri(createVector2(-1, -1), createVector2(1, -1), createVector2(0, 1))
+        createTri(V2.create(-12, 12), V2.create(0, -24), V2.create(0, 0), "yellow"),
+        createTri(V2.create(12, 12), V2.create(0, -24), V2.create(0, 0), "red")
     ]
 ]
 
@@ -74,10 +63,11 @@ function createRGBA(r, g, b, a) {
 
 function createTransform(x, y) {
     return t = { 
-        position: createVector2(x, y),
+        position: V2.create(x, y),
         rotation: 0,
+        scale: V2.create(1, 1),
         forward() {
-            return rotateVector2(createVector2(0, -1), this.rotation);
+            return V2.rotate(V2.up(0, -1), this.rotation);
         }
     };
 }
@@ -85,15 +75,15 @@ function createTransform(x, y) {
 function createRigidbody(transform, collisionEnabled) {
     let rb = {
         transform: transform,
-        velocity: createVector2(0, 0),
+        velocity: V2.create(0, 0),
         rotationSpeed: 0,
-        acceleration: createVector2(0, 0),
+        acceleration: V2.create(0, 0),
         mass: 0, 
         bounciness: 0,
         collisionEnabled: collisionEnabled,
         update() {
-            this.velocity = addVector2(this.velocity, this.acceleration);
-            this.transform.position = addVector2(this.transform.position, this.velocity);
+            this.velocity = V2.add(this.velocity, this.acceleration);
+            this.transform.position = V2.add(this.transform.position, this.velocity);
             this.transform.rotation = (this.transform.rotation + this.rotationSpeed) % 360;
             if (this.transform.rotation < 0) {
                 this.transform.rotation += 360;
@@ -105,30 +95,20 @@ function createRigidbody(transform, collisionEnabled) {
     return rb;
 }
 
-function createStar(x, y, model, colorA, colorB) {
-    return newStar = {
-        t: createTransform(x, y),
-        rb: createRigidbody(t, false),
-        model: model,
-        colorA: colorA,
-        colorB: colorB
-    }
-}
-
-function createPlayer(color, x, y, keybindings) {
+function createPlayer(color, x, y, model, keybindings) {
     return newPlayer = {
         t: createTransform(x, y),
         rb: createRigidbody(t, true),
-        model: shipModels[0],
+        model: model,
         color: color,
         keys: keybindings,
 
         accelerate(speed) {
-            this.rb.velocity = addVector2(this.rb.velocity, rotateVector2(createVector2(0, -speed), this.t.rotation));
+            this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, -speed), this.t.rotation));
         },
 
         decelerate(speed) {
-            this.rb.velocity = addVector2(this.rb.velocity, rotateVector2(createVector2(0, speed), this.t.rotation));
+            this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, speed), this.t.rotation));
         },
 
         turn(speed) {
@@ -147,70 +127,24 @@ function update() {
     }
 }
 
-function createStars(starCount) {
-    for(let i = 0; i < starCount; i++) {
-        let x = canvas.clientWidth * Math.random();
-        let y = canvas.clientHeight * Math.random();
-        let s = createStar(x, y, starModels[0], createRGBA(255 * Math.random(), 255 * Math.random(), 255, 1), createRGBA(255, 0, 0, 1));
-        s.rb.velocity = createVector2((Math.random() * 2 - 1) * 0.01, (Math.random() * 2 - 1) * 0.01);
-        s.rb.rotationSpeed = Math.random();
-        stars.push(s);
-    }
-}
-
 function createPlayers(playerCount) {
     playerCount = Math.min(playerCount, 4);
     players = [];
     // Not using break on purpose so it cascades down each case. 
     switch(playerCount) {
         case 4:
-            players.push(createPlayer(createRGBA(0, 255, 0, 1), center.x * 0.5, center.y * 0.5, defaultKeys[3]));
+            players.push(createPlayer(createRGBA(0, 255, 0, 1), center.x * 0.5, center.y * 0.5, shipModels[1], defaultKeys[3]));
         case 3:
-            players.push(createPlayer(createRGBA(0, 0, 255, 1), center.x * 1.5, center.y * 1.5, defaultKeys[2]));
+            players.push(createPlayer(createRGBA(0, 0, 255, 1), center.x * 1.5, center.y * 1.5, shipModels[0], defaultKeys[2]));
         case 2:
-            players.push(createPlayer(createRGBA(255, 0, 0, 1), center.x * 1.5, center.y * 0.5, defaultKeys[1]));
+            players.push(createPlayer(createRGBA(255, 0, 0, 1), center.x * 1.5, center.y * 0.5, shipModels[1], defaultKeys[1]));
         default:
-            players.push(createPlayer(createRGBA(255, 0, 255, 1), center.x * 0.5, center.y * 1.5, defaultKeys[0]));
+            players.push(createPlayer(createRGBA(255, 0, 255, 1), center.x * 0.5, center.y * 1.5, shipModels[0], defaultKeys[0]));
     }
 }
 
 function initialiseGameData(playerCount) {
     createPlayers(playerCount); 
-}
-
-function renderStar(star) {
-    let pos = star.t.position;
-
-    ctx.save();
-    ctx.translate(pos.x, pos.y);
-    ctx.rotate(degToRad(star.t.rotation));
-
-    for(let tri of star.model) {
-        let color = star.colorA.toString();
-        drawTri(tri, color);
-    }
-
-    ctx.restore();
-}
-
-function renderPlayer(player) {
-
-    let pos = player.t.position;
-
-    ctx.save();
-    ctx.translate(pos.x, pos.y);
-    ctx.rotate(degToRad(player.t.rotation));
-
-    let cos = Math.max(Math.cos(degToRad(player.t.rotation)), 0.45);
-    let sin = Math.max(Math.sin(degToRad(player.t.rotation)), 0.45);
-    let c = player.color;
-
-    for(let tri of player.model) {
-        let color = `rgb(${cos * c.r + sin * c.r}, ${cos * c.g + -sin * c.g}, ${cos * c.b + sin * c.b}, 1)`;
-        drawTri(tri, color);
-    }
-
-    ctx.restore();
 }
 
 function renderPlayerDebug(player) {
@@ -226,8 +160,12 @@ function renderPlayerDebug(player) {
     // Draw forward direction.
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
-    ctx.lineTo(pos.x + f.x * 75, pos.y + f.y * 75);
+    ctx.lineTo(pos.x + f.x * scale * 40, pos.y + f.y * scale * 40);
     ctx.closePath();
+    ctx.stroke();
+
+    //ctx.moveTo(pos.x, pos.y);
+    ctx.arc(pos.x, pos.y, scale * 25, 0, 2 * Math.PI);
     ctx.stroke();
 
     ctx.save(); 
@@ -243,19 +181,33 @@ function renderPlayerDebug(player) {
     ctx.restore();
 }
 
+function renderFPS() {
+    ctx.save();
+    ctx.strokeStyle = debugPlayerColor;
+    ctx.fillStyle = debugPlayerColor;
+    ctx.font = "24px Arial";
+
+    ctx.fillText(`${fps}`, 10, 30);
+
+    ctx.restore();
+}
+
+function updateFPS() {
+    fps = Math.round(1000 / Math.abs(timeToRender));
+}
+
 function renderScene() {
     setCanvasSize(canvas, ctx, scale, canvas.clientWidth, canvas.clientHeight);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-    
-    for(let star of stars) {
-        renderStar(star);
-    }
 
     for(let player of players) {
-        renderPlayer(player);
+        drawModel(player.t, player.model);
     }
 
     if(debug) {
+        // Really need to have this update every second or something, instead of constantly.
+        timeToRender -= new Date().getTime();
+        renderFPS();
         for(let player of players) {
             renderPlayerDebug(player);
         }
@@ -263,6 +215,7 @@ function renderScene() {
 }
 
 function tick() {
+    timeToRender = new Date().getTime();
     update();
     renderScene();
     requestAnimationFrame(tick);
@@ -270,5 +223,8 @@ function tick() {
 
 window.addEventListener("keydown", processKey);
 initialiseGameData(2);
-createStars(100);
 requestAnimationFrame(tick);
+
+setInterval(() => {
+    updateFPS();
+}, 1000);
