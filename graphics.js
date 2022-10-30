@@ -18,7 +18,7 @@ function createTri(v1, v2, v3, color) {
 function drawModel(transform, model) {
     ctx.save();
     ctx.translate(transform.position.x, transform.position.y);
-    ctx.rotate(degToRad(transform.rotation));
+    ctx.rotate(Util.degToRad(transform.rotation));
 
     let scaledModel = scaleModel(model, transform.scale);
 

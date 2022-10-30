@@ -45,8 +45,8 @@ const V2 = (function () {
     };
 
     const rotate = function(v, degrees) {
-        let cos = Math.cos(degToRad(degrees));
-        let sin = Math.sin(degToRad(degrees));
+        let cos = Math.cos(Util.degToRad(degrees));
+        let sin = Math.sin(Util.degToRad(degrees));
         return this.create(cos * v.x + -sin * v.y, sin * v.x + cos * v.y);
     };
 

@@ -173,11 +173,11 @@ function renderPlayerDebug(player) {
     ctx.translate(pos.x, pos.y);
     
     // Debug text. 
-    ctx.fillText(`pos: ${roundTo(pos.x, 0)}, ${roundTo(pos.y, 0)}`, 40, -30);
-    ctx.fillText(`rot: ${roundTo(player.t.rotation, 0)}`, 40, 0);
-    ctx.fillText(`f: ${roundTo(f.x, 2)}, ${roundTo(f.y, 2)}`, 40, 30);
-    ctx.fillText(`v: ${roundTo(v.x, 2)}, ${roundTo(v.y, 2)}`, 40, 60);
-    ctx.fillText(`rs: ${roundTo(player.rb.rotationSpeed, 2)}`, 40, 90);
+    ctx.fillText(`pos: ${Util.roundTo(pos.x, 0)}, ${Util.roundTo(pos.y, 0)}`, 40, -30);
+    ctx.fillText(`rot: ${Util.roundTo(player.t.rotation, 0)}`, 40, 0);
+    ctx.fillText(`f: ${Util.roundTo(f.x, 2)}, ${Util.roundTo(f.y, 2)}`, 40, 30);
+    ctx.fillText(`v: ${Util.roundTo(v.x, 2)}, ${Util.roundTo(v.y, 2)}`, 40, 60);
+    ctx.fillText(`rs: ${Util.roundTo(player.rb.rotationSpeed, 2)}`, 40, 90);
 
     ctx.restore();
 }
