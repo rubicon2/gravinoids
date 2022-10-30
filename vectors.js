@@ -61,7 +61,6 @@ const V2 = (function () {
         magnitude: magnitude,
         dot: dot,
         crossProduct: crossProduct,
-        normal: normal,
         rotate: rotate
     }
 
