@@ -4,6 +4,7 @@ const scale = window.devicePixelRatio;
 const center = V2.create(canvas.clientWidth / 2, canvas.clientHeight / 2); 
 
 const maxAcceleration = 5;
+const maxRotationSpeed = 10;
 const accelerationSpeed = 0.2;
 const brakingSpeed = 0.5;
 const turningSpeed = 0.2;
