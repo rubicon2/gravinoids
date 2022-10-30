@@ -1,43 +1,68 @@
-const V2 = {
-    create(x, y) {
+const V2 = (function () {
+    "use strict";
+
+    const create = function(x, y) {
         return {
             x: x,
             y: y
         }
-    },
-    up() {
+    };
+
+    const up = function() {
         return this.create(0, -1);
-    },
-    down() {
+    };
+
+    const down = function() {
         return this.create(0, 1);
-    },
-    left() {
+    };
+
+    const left = function() {
         return this.create(-1, 0);
-    }, 
-    right() {
+    }; 
+
+    const right = function() {
         return this.create(1, 0);
-    },
-    add(v1, v2) {
+    };
+
+    const add = function(v1, v2) {
         return this.create(v1.x + v2.x, v1.y + v2.y);
-    },
-    sub(v1, v2) {
+    }
+
+    const sub = function(v1, v2) {
         return this.create(v1.x - v2.x, v1.y - v2.y);
-    },
-    magnitude(v) {
+    };
+
+    const magnitude = function(v) {
         return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
-    },
-    dot(v1, v2) {
+    };
+
+    const dot = function(v1, v2) {
         return v1.x * v2.x + v1.y * v2.y;    
-    },
-    crossProduct(v1, v2) {
+    };
+
+    const crossProduct = function(v1, v2) {
         return createVector2(v1.x * v2.y - v1.y * v2.x); 
-    },
-    normal(v1, v2) {
-        console.log("Dunno lol");
-    },
-    rotate(v, degrees) {
+    };
+
+    const rotate = function(v, degrees) {
         let cos = Math.cos(degToRad(degrees));
         let sin = Math.sin(degToRad(degrees));
         return this.create(cos * v.x + -sin * v.y, sin * v.x + cos * v.y);
+    };
+
+    return {
+        create: create,
+        up: up,
+        down: down,
+        left: left,
+        right: right,
+        add: add,
+        sub: sub,
+        magnitude: magnitude,
+        dot: dot,
+        crossProduct: crossProduct,
+        normal: normal,
+        rotate: rotate
     }
-}
+
+})();
