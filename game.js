@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 const scale = window.devicePixelRatio;
 const center = V2.create(canvas.clientWidth / 2, canvas.clientHeight / 2); 
 
-const maxAcceleration = 5;
+const maxSpeed = 5;
 const maxRotationSpeed = 10;
 const accelerationSpeed = 0.2;
 const brakingSpeed = 0.5;
@@ -106,14 +106,20 @@ function createPlayer(color, x, y, model, keybindings) {
 
         accelerate(speed) {
             this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, -speed), this.t.rotation));
+            if (V2.magnitude(this.rb.velocity) > maxSpeed) {
+                this.rb.velocity = V2.scale(V2.normalize(this.rb.velocity), maxSpeed);
+            }
         },
 
         decelerate(speed) {
             this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, speed), this.t.rotation));
+            if (V2.magnitude(this.rb.velocity) > maxSpeed) {
+                this.rb.velocity = V2.scale(V2.normalize(this.rb.velocity), maxSpeed);
+            }
         },
 
         turn(speed) {
-            this.rb.rotationSpeed += speed;
+            this.rb.rotationSpeed = Util.clamp(this.rb.rotationSpeed += speed, -maxRotationSpeed, maxRotationSpeed);
         },
 
         action() {
