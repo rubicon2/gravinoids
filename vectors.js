@@ -4,7 +4,7 @@ const V2 = (function () {
     const create = function(x, y) {
         return {
             x: x,
-            y: y
+            y: y,
         }
     };
 
@@ -23,6 +23,15 @@ const V2 = (function () {
     const sub = function(v1, v2) {
         return this.create(v1.x - v2.x, v1.y - v2.y);
     };
+
+    const scale = function(v1, s) {
+        return this.create(v1.x * s, v1.y * s);
+    }
+
+    const normalize = function(v1) {
+        let m = magnitude(v1);
+        return create(v1.x / m, v1.y / m);
+    }
 
     const magnitude = function(v) {
         return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
@@ -54,6 +63,8 @@ const V2 = (function () {
         right: right,
         add: add,
         sub: sub,
+        scale: scale,
+        normalize: normalize,
         magnitude: magnitude,
         dot: dot,
         crossProduct: crossProduct,
