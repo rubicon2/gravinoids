@@ -8,21 +8,13 @@ const V2 = (function () {
         }
     };
 
-    const up = function() {
-        return this.create(0, -1);
-    };
+    const up = create(0, -1);
 
-    const down = function() {
-        return this.create(0, 1);
-    };
+    const down = create(0, 1);
 
-    const left = function() {
-        return this.create(-1, 0);
-    }; 
+    const left = create(-1, 0);
 
-    const right = function() {
-        return this.create(1, 0);
-    };
+    const right = create(1, 0);
 
     const add = function(v1, v2) {
         return this.create(v1.x + v2.x, v1.y + v2.y);

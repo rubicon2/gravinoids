@@ -68,7 +68,7 @@ function createTransform(x, y) {
         rotation: 0,
         scale: V2.create(1, 1),
         forward() {
-            return V2.rotate(V2.up(0, -1), this.rotation);
+            return V2.rotate(V2.up, this.rotation);
         }
     };
 }
