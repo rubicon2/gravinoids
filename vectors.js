@@ -37,9 +37,13 @@ const V2 = (function () {
     };
 
     const rotate = function(v, degrees) {
-        let cos = Math.cos(Util.degToRad(degrees));
-        let sin = Math.sin(Util.degToRad(degrees));
+        let cos = Math.cos(degToRad(degrees));
+        let sin = Math.sin(degToRad(degrees));
         return this.create(cos * v.x + -sin * v.y, sin * v.x + cos * v.y);
+    };
+
+    const degToRad = function(deg) {
+        return deg * Math.PI / 180;
     };
 
     return {
@@ -53,6 +57,7 @@ const V2 = (function () {
         magnitude: magnitude,
         dot: dot,
         crossProduct: crossProduct,
+        degToRad: degToRad,
         rotate: rotate
     }
 

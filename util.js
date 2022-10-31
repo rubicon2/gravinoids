@@ -35,10 +35,6 @@ const Util = (function() {
     
         return shuffled;
     };
-    
-    const degToRad = function(deg) {
-        return deg * Math.PI / 180;
-    };
 
     return {
         getRangedRandom: getRangedRandom,
@@ -46,7 +42,6 @@ const Util = (function() {
         randomiseVector: randomiseVector,
         roundTo: roundTo,
         shuffleArray: shuffleArray,
-        degToRad: degToRad
     }
 
 })();
