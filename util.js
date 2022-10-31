@@ -9,6 +9,10 @@ const Util = (function() {
     const getRangedRandomInt = function(min, max) {
         return Math.round(getRangedRandom(min, max));
     };
+
+    const clamp = function(value, min, max) {
+        return Math.max(Math.min(value, max), min);
+    }
     
     const randomiseVector = function(v, min, max) {
         v.x = getRangedRandom(min, max);
@@ -39,6 +43,7 @@ const Util = (function() {
     return {
         getRangedRandom: getRangedRandom,
         getRangedRandomInt: getRangedRandomInt,
+        clamp: clamp,
         randomiseVector: randomiseVector,
         roundTo: roundTo,
         shuffleArray: shuffleArray,
