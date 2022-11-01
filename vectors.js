@@ -8,6 +8,8 @@ const V2 = (function () {
         }
     };
 
+    const zero = create(0, 0);
+
     const up = create(0, -1);
 
     const down = create(0, 1);
@@ -57,6 +59,7 @@ const V2 = (function () {
 
     return {
         create: create,
+        zero: zero,
         up: up,
         down: down,
         left: left,
