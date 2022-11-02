@@ -52,7 +52,8 @@ const Util = (function() {
         // "Normalize" position for lerp so it is always between min and max, 
         // and loops around by the appropriate amount as per above.
         let t = inverseLerp(min, max, value);
-        t = t < 0 ? 1 + (t % 1): t % 1;
+        // If t is less than zero, use it as a negative offset from 1 (i.e. max value), otherwise just modulo it to loop past 1.
+        t = t < 0 ? 1 + (t % 1) : t % 1;
         return lerp(min, max, t);
     }
 
