@@ -40,6 +40,22 @@ const Util = (function() {
         return shuffled;
     };
 
+    const lerp = function(min, max, t) {
+        return min + (max - min) * t;
+    }
+
+    const inverseLerp = function(min, max, value) {
+        return (value - min) / (max - min);
+    }
+
+    const loopNumber = function(min, max, value) {
+        // "Normalize" position for lerp so it is always between min and max, 
+        // and loops around by the appropriate amount as per above.
+        let t = inverseLerp(min, max, value);
+        t = t < 0 ? 1 + (t % 1): t % 1;
+        return lerp(min, max, t);
+    }
+
     return {
         getRangedRandom: getRangedRandom,
         getRangedRandomInt: getRangedRandomInt,
@@ -47,6 +63,9 @@ const Util = (function() {
         randomiseVector: randomiseVector,
         roundTo: roundTo,
         shuffleArray: shuffleArray,
+        lerp: lerp,
+        inverseLerp: inverseLerp,
+        loopNumber: loopNumber
     }
 
 })();

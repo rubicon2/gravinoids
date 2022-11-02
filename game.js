@@ -89,7 +89,8 @@ function createRigidbody(transform, collisionEnabled) {
             if (this.transform.rotation < 0) {
                 this.transform.rotation += 360;
             }
-        }
+        },
+        createPlayer: createPlayer
     }
     // To ensure a rigibody is not created without being added to the list for processing, do it here. 
     rigidbodies.push(rb);
@@ -131,6 +132,10 @@ function createPlayer(color, x, y, model, keybindings) {
 function update() {
     for(let rb of rigidbodies) {
         rb.update();
+        rb.transform.position = V2.create(
+            Util.loopNumber(0, canvas.clientWidth, rb.transform.position.x), 
+            Util.loopNumber(0, canvas.clientHeight, rb.transform.position.y)
+        );
     }
 }
 
