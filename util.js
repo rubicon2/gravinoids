@@ -49,6 +49,11 @@ const Util = (function() {
     }
 
     const loopNumber = function(min, max, value) {
+        // ****** BUG ****** 
+        // Negative inverseLerp result makes this go from min + 1 to max, 
+        // instead of expected min to max - 1 that positive inverseLerp result yields.
+        // This means this function will not work with arrays. FIX!!
+
         // "Normalize" position for lerp so it is always between min and max, 
         // and loops around by the appropriate amount as per above.
         let t = inverseLerp(min, max, value);
