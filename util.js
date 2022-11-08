@@ -10,7 +10,7 @@ const Util = (function() {
         return Math.round(getRangedRandom(min, max));
     };
 
-    const clamp = function(value, min, max) {
+    const clamp = function(min, max, value) {
         return Math.max(Math.min(value, max), min);
     }
     
