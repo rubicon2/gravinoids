@@ -62,11 +62,11 @@ function createRGBA(r, g, b, a) {
     }
 }
 
-function createTransform(x, y) {
+function createTransform(x, y, rotation, scale) {
     return { 
         position: V2.create(x, y),
-        rotation: 0,
-        scale: V2.create(1, 1),
+        rotation: rotation,
+        scale: scale,
         forward() {
             return V2.rotate(V2.up, this.rotation);
         }
@@ -94,7 +94,7 @@ function createRigidbody(transform, collisionEnabled) {
 }
 
 function createPlayer(color, x, y, model, keybindings) {
-    let newTransform = createTransform(x, y);
+    let newTransform = createTransform(x, y, Math.random() * 360, V2.one);
     return {
         t: newTransform,
         rb: createRigidbody(newTransform, true),
@@ -124,6 +124,25 @@ function createPlayer(color, x, y, model, keybindings) {
             // Do something!
         }
     }
+}
+
+function drawModelCopies(transform, model) {
+    let newTransform = createTransform(transform.position.x + canvas.clientWidth, 
+                                       transform.position.y, 
+                                       transform.rotation, 
+                                       transform.scale);
+    drawModel(newTransform, model);
+
+    newTransform.position.x -= canvas.clientWidth * 2;
+    drawModel(newTransform, model);
+
+    newTransform.position.x += canvas.clientWidth;
+    newTransform.position.y -= canvas.clientHeight;
+    drawModel(newTransform, model);
+
+    newTransform.position.y += canvas.clientHeight * 2;
+    drawModel(newTransform, model);
+
 }
 
 function update() {
@@ -211,10 +230,10 @@ function renderScene() {
 
     for(let player of players) {
         drawModel(player.t, player.model);
+        drawModelCopies(player.t, player.model);
     }
 
     if(debug) {
-        // Really need to have this update every second or something, instead of constantly.
         timeToRender -= new Date().getTime();
         renderFPS();
         for(let player of players) {
