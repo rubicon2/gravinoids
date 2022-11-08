@@ -51,11 +51,11 @@ let shipModels = [
 ]
 
 function createRGBA(r, g, b, a) {
-    return rgba = {
-        r: r,
-        g: g,
-        b: b,
-        a: a,
+    return {
+        r: Util.clamp(0, 255, r),
+        g: Util.clamp(0, 255, g),
+        b: Util.clamp(0, 255, b),
+        a: Util.clamp(0, 1, a),
         toString() {
             return `rgba(${r}, ${g}, ${b}, ${a})`;
         }
@@ -120,7 +120,7 @@ function createPlayer(color, x, y, model, keybindings) {
         },
 
         turn(speed) {
-            this.rb.rotationSpeed = Util.clamp(this.rb.rotationSpeed += speed, -maxRotationSpeed, maxRotationSpeed);
+            this.rb.rotationSpeed = Util.clamp(-maxRotationSpeed, maxRotationSpeed, this.rb.rotationSpeed += speed);
         },
 
         action() {
