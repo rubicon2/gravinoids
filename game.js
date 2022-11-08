@@ -63,7 +63,7 @@ function createRGBA(r, g, b, a) {
 }
 
 function createTransform(x, y) {
-    return t = { 
+    return { 
         position: V2.create(x, y),
         rotation: 0,
         scale: V2.create(1, 1),
@@ -89,8 +89,7 @@ function createRigidbody(transform, collisionEnabled) {
             if (this.transform.rotation < 0) {
                 this.transform.rotation += 360;
             }
-        },
-        createPlayer: createPlayer
+        }
     }
     // To ensure a rigibody is not created without being added to the list for processing, do it here. 
     rigidbodies.push(rb);
@@ -98,9 +97,10 @@ function createRigidbody(transform, collisionEnabled) {
 }
 
 function createPlayer(color, x, y, model, keybindings) {
-    return newPlayer = {
-        t: createTransform(x, y),
-        rb: createRigidbody(t, true),
+    let newTransform = createTransform(x, y);
+    return {
+        t: newTransform,
+        rb: createRigidbody(newTransform, true),
         model: model,
         color: color,
         keys: keybindings,
