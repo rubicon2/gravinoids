@@ -12,19 +12,19 @@ const Util = (function() {
 
     const clamp = function(min, max, value) {
         return Math.max(Math.min(value, max), min);
-    }
+    };
     
     const randomiseVector = function(v, min, max) {
         v.x = getRangedRandom(min, max);
         v.y = getRangedRandom(min, max);
-    }
+    };
     
     const roundTo = function(float, digits) {
         digits = Math.pow(10, digits);
         float *= digits;
         float = Math.round(float);
         return float /= digits;
-    }
+    };
     
     const shuffleArray = function(array) {
     
@@ -42,24 +42,25 @@ const Util = (function() {
 
     const lerp = function(min, max, t) {
         return min + (max - min) * t;
-    }
+    };
 
     const inverseLerp = function(min, max, value) {
         return (value - min) / (max - min);
-    }
+    };
 
     const loopNumber = function(min, max, value) {
-        // ****** BUG ****** 
-        // Negative inverseLerp result makes this go from min + 1 to max, 
-        // instead of expected min to max - 1 that positive inverseLerp result yields.
-        // This means this function will not work with arrays. FIX!!
-
         // "Normalize" position for lerp so it is always between min and max, 
         // and loops around by the appropriate amount as per above.
         let t = inverseLerp(min, max, value);
-        // If t is less than zero, use it as a negative offset from 1 (i.e. max value), otherwise just modulo it to loop past 1.
-        t = t < 0 ? 1 + (t % 1) : t % 1;
+        // Old version
+        // t = t < 0 ? (1 + t % 1) % 1 : t % 1;
+        // New version
+        t = (1 + t % 1) % 1;
         return lerp(min, max, t);
+    };
+
+    const loopInt = function(min, max, value) {
+        return Math.round(loopNumber(min, max, value));
     }
 
     return {
@@ -71,7 +72,8 @@ const Util = (function() {
         shuffleArray: shuffleArray,
         lerp: lerp,
         inverseLerp: inverseLerp,
-        loopNumber: loopNumber
-    }
+        loopNumber: loopNumber,
+        loopInt: loopInt
+    };
 
 })();

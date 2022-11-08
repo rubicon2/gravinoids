@@ -85,10 +85,7 @@ function createRigidbody(transform, collisionEnabled) {
         update() {
             this.velocity = V2.add(this.velocity, this.acceleration);
             this.transform.position = V2.add(this.transform.position, this.velocity);
-            this.transform.rotation = (this.transform.rotation + this.rotationSpeed) % 360;
-            if (this.transform.rotation < 0) {
-                this.transform.rotation += 360;
-            }
+            this.transform.rotation = Util.loopNumber(0, 360, this.transform.rotation + this.rotationSpeed);
         }
     }
     // To ensure a rigibody is not created without being added to the list for processing, do it here. 
