@@ -63,6 +63,18 @@ const Util = (function() {
         return Math.round(loopNumber(min, max, value));
     }
 
+    const deepClone = function(obj) {
+        let clone = {};
+        for(let property in obj) {
+            let value = obj[property];
+            if (typeof value === "Object")
+                clone[property] = deepClone(value);
+            else 
+                clone[property] = value;
+        }
+        return clone;
+    }
+
     return {
         getRangedRandom: getRangedRandom,
         getRangedRandomInt: getRangedRandomInt,
@@ -73,7 +85,8 @@ const Util = (function() {
         lerp: lerp,
         inverseLerp: inverseLerp,
         loopNumber: loopNumber,
-        loopInt: loopInt
+        loopInt: loopInt,
+        deepClone: deepClone
     };
 
 })();
