@@ -64,8 +64,7 @@ const Util = (function() {
     }
 
     const deepClone = function(obj) {
-        // What about the prototypes of objects?
-        let clone = {};
+        let clone = Object.create(Object.getPrototypeOf(obj));
         for(let property in obj) {
             let value = obj[property];
             if (typeof value === "object")
