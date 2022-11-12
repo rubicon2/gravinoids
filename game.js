@@ -127,10 +127,9 @@ function createPlayer(color, x, y, model, keybindings) {
 }
 
 function drawModelCopies(transform, model) {
-    let newTransform = createTransform(transform.position.x + canvas.clientWidth, 
-                                       transform.position.y, 
-                                       transform.rotation, 
-                                       transform.scale);
+    let newTransform = Util.deepClone(transform);
+
+    newTransform.position.x += canvas.clientWidth;
     drawModel(newTransform, model);
 
     newTransform.position.x -= canvas.clientWidth * 2;
@@ -142,7 +141,6 @@ function drawModelCopies(transform, model) {
 
     newTransform.position.y += canvas.clientHeight * 2;
     drawModel(newTransform, model);
-
 }
 
 function update() {
