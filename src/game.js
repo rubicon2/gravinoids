@@ -1,15 +1,19 @@
 require("./styles.css");
+import * as Util from "./modules/util";
+import * as V2 from "./modules/vectors";
+import { setCanvasSize, createTri, drawModel } from "./modules/graphics";
+import processKey from "./modules/input";
 
-const canvas = document.querySelector("#renderCanvas");
-const ctx = canvas.getContext("2d");
+let canvas = null;
+let ctx = null;
 const scale = window.devicePixelRatio;
-const center = V2.create(canvas.clientWidth / 2, canvas.clientHeight / 2); 
+let center = V2.zero; 
 
 const maxSpeed = 5;
 const maxRotationSpeed = 10;
-const accelerationSpeed = 0.2;
-const brakingSpeed = 0.5;
-const turningSpeed = 0.2;
+const defaultAccelerationSpeed = 0.2;
+const defaultBrakingSpeed = 0.5;
+const defaultTurningSpeed = 0.2;
 
 let players = [];
 let stars = [];
@@ -103,6 +107,9 @@ function createPlayer(color, x, y, model, keybindings) {
         model: model,
         color: color,
         keys: keybindings,
+        accelerationSpeed: defaultAccelerationSpeed,
+        brakingSpeed: defaultBrakingSpeed,
+        turningSpeed: defaultTurningSpeed,
 
         accelerate(speed) {
             this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, -speed), this.t.rotation));
@@ -132,17 +139,17 @@ function drawModelCopies(transform, model) {
     let newTransform = Util.deepClone(transform);
 
     newTransform.position.x += canvas.clientWidth;
-    drawModel(newTransform, model);
+    drawModel(ctx, newTransform, model);
 
     newTransform.position.x -= canvas.clientWidth * 2;
-    drawModel(newTransform, model);
+    drawModel(ctx, newTransform, model);
 
     newTransform.position.x += canvas.clientWidth;
     newTransform.position.y -= canvas.clientHeight;
-    drawModel(newTransform, model);
+    drawModel(ctx, newTransform, model);
 
     newTransform.position.y += canvas.clientHeight * 2;
-    drawModel(newTransform, model);
+    drawModel(ctx, newTransform, model);
 }
 
 function update() {
@@ -229,7 +236,7 @@ function renderScene() {
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     for(let player of players) {
-        drawModel(player.t, player.model);
+        drawModel(ctx, player.t, player.model);
         drawModelCopies(player.t, player.model);
     }
 
@@ -249,9 +256,22 @@ function tick() {
     requestAnimationFrame(tick);
 }
 
-window.addEventListener("keydown", processKey);
+function initialiseCanvas() {
+    canvas = document.createElement("canvas");
+    canvas.id = "renderCanvas";
+    document.querySelector("body").appendChild(canvas);
+
+    ctx = canvas.getContext("2d");
+    center = V2.create(canvas.clientWidth / 2, canvas.clientHeight / 2); 
+}
+
+initialiseCanvas();
 initialiseGameData(2);
 requestAnimationFrame(tick);
+
+window.addEventListener("keydown", function(e) {
+    processKey(players, e);
+});
 
 setInterval(() => {
     updateFPS();

@@ -1,4 +1,4 @@
-function processKey(e) {
+export default function(players, e) {
     // switch(e.code) {
     //     case "KeyW":
     //         //players[0].rb.velocity = addVector2(players[0].rb.velocity, rotateVector2(createVector2(0, -0.2), players[0].t.rotation));
@@ -22,16 +22,16 @@ function processKey(e) {
         let keys = p.keys;
         switch(e.code) {
             case keys.up:
-                p.accelerate(accelerationSpeed);
+                p.accelerate(p.accelerationSpeed);
                 break;
             case keys.down:
-                p.decelerate(accelerationSpeed);
+                p.decelerate(p.accelerationSpeed);
                 break;
             case keys.left:
-                p.turn(-turningSpeed);
+                p.turn(-p.turningSpeed);
                 break;
             case keys.right:
-                p.turn(turningSpeed);
+                p.turn(p.turningSpeed);
                 break;
             case keys.action:
                 p.action();

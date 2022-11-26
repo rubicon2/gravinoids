@@ -1,4 +1,6 @@
-function setCanvasSize(canvas, context, scale, width, height) {
+import * as V2 from "./vectors";
+
+const setCanvasSize = function(canvas, context, scale, width, height) {
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
     canvas.width = width * scale;
@@ -6,7 +8,7 @@ function setCanvasSize(canvas, context, scale, width, height) {
     context.scale(scale, scale);
 }
 
-function createTri(v1, v2, v3, color) {
+const createTri = function(v1, v2, v3, color) {
     return {
         v1: v1,
         v2: v2,
@@ -15,21 +17,8 @@ function createTri(v1, v2, v3, color) {
     }
 }
 
-function drawModel(transform, model) {
-    ctx.save();
-    ctx.translate(transform.position.x, transform.position.y);
-    ctx.rotate(V2.degToRad(transform.rotation));
-
-    let scaledModel = scaleModel(model, transform.scale);
-
-    for(let tri of scaledModel) {
-        drawTri(tri, tri.color);
-    }
-
-    ctx.restore();
-}
-
-function drawTri(tri, color) {
+const drawTri = function(ctx, tri, color) {
+    let scale = window.devicePixelRatio;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(tri.v1.x * scale, tri.v1.y * scale);
@@ -39,7 +28,21 @@ function drawTri(tri, color) {
     ctx.fill();
 }
 
-function scaleModel(model, scale) {
+const drawModel = function(ctx, transform, model) {
+    ctx.save();
+    ctx.translate(transform.position.x, transform.position.y);
+    ctx.rotate(V2.degToRad(transform.rotation));
+
+    let scaledModel = scaleModel(model, transform.scale);
+
+    for(let tri of scaledModel) {
+        drawTri(ctx, tri, tri.color);
+    }
+
+    ctx.restore();
+}
+
+const scaleModel = function(model, scale) {
     let scaledModel = [];
     for(let tri of model) {
         let scaledTri = createTri(V2.create(tri.v1.x * scale.x, tri.v1.y * scale.y),
@@ -49,4 +52,12 @@ function scaleModel(model, scale) {
         scaledModel.push(scaledTri);
     }
     return scaledModel;
+}
+
+export {
+    setCanvasSize,
+    createTri,
+    drawTri,
+    drawModel,
+    scaleModel
 }

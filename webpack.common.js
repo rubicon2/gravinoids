@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
     entry: {
-        game: "./game.js",
+        game: "./src/game.js",
     },
     module: {
         rules: [
@@ -13,6 +13,8 @@ module.exports = {
         ],
     },
     plugins: [
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            title: "GRAVINOIDS",
+        }),
     ]
 }
