@@ -73,26 +73,6 @@ function createRGBA(r, g, b, a) {
     }
 }
 
-// function createRigidbody(transform, collisionEnabled) {
-//     let rb = {
-//         transform: transform,
-//         velocity: V2.create(0, 0),
-//         rotationSpeed: 0,
-//         acceleration: V2.create(0, 0),
-//         mass: 0, 
-//         bounciness: 0,
-//         collisionEnabled: collisionEnabled,
-//         update() {
-//             this.velocity = V2.add(this.velocity, this.acceleration);
-//             this.transform.v2_position = V2.add(this.transform.v2_position, this.velocity);
-//             this.transform.n_rotation = Util.loopNumber(0, 360, this.transform.n_rotation + this.rotationSpeed);
-//         }
-//     }
-//     // To ensure a rigibody is not created without being added to the list for processing, do it here. 
-//     rigidbodies.push(rb);
-//     return rb;
-// }
-
 function createPlayer(color, x, y, model, keybindings) {
     let newTransform = new Transform(V2.create(x, y), Math.random() * 360, V2.one);
     return {
