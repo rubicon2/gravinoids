@@ -1,5 +1,6 @@
 require("./styles.css");
 import * as Util from "./modules/util";
+import Transform from "./modules/transform";
 import * as V2 from "./modules/vectors";
 import { setCanvasSize, createTri, drawModel } from "./modules/graphics";
 import processKey from "./modules/input";
@@ -68,17 +69,6 @@ function createRGBA(r, g, b, a) {
     }
 }
 
-function createTransform(x, y, rotation, scale) {
-    return { 
-        position: V2.create(x, y),
-        rotation: rotation,
-        scale: scale,
-        forward() {
-            return V2.rotate(V2.up, this.rotation);
-        }
-    };
-}
-
 function createRigidbody(transform, collisionEnabled) {
     let rb = {
         transform: transform,
@@ -90,8 +80,8 @@ function createRigidbody(transform, collisionEnabled) {
         collisionEnabled: collisionEnabled,
         update() {
             this.velocity = V2.add(this.velocity, this.acceleration);
-            this.transform.position = V2.add(this.transform.position, this.velocity);
-            this.transform.rotation = Util.loopNumber(0, 360, this.transform.rotation + this.rotationSpeed);
+            this.transform.v2_position = V2.add(this.transform.v2_position, this.velocity);
+            this.transform.n_rotation = Util.loopNumber(0, 360, this.transform.n_rotation + this.rotationSpeed);
         }
     }
     // To ensure a rigibody is not created without being added to the list for processing, do it here. 
@@ -100,7 +90,7 @@ function createRigidbody(transform, collisionEnabled) {
 }
 
 function createPlayer(color, x, y, model, keybindings) {
-    let newTransform = createTransform(x, y, Math.random() * 360, V2.one);
+    let newTransform = new Transform(V2.create(x, y), Math.random() * 360, V2.one);
     return {
         t: newTransform,
         rb: createRigidbody(newTransform, true),
@@ -112,14 +102,14 @@ function createPlayer(color, x, y, model, keybindings) {
         turningSpeed: defaultTurningSpeed,
 
         accelerate(speed) {
-            this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, -speed), this.t.rotation));
+            this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, -speed), this.t.n_rotation));
             if (V2.magnitude(this.rb.velocity) > maxSpeed) {
                 this.rb.velocity = V2.scale(V2.normalize(this.rb.velocity), maxSpeed);
             }
         },
 
         decelerate(speed) {
-            this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, speed), this.t.rotation));
+            this.rb.velocity = V2.add(this.rb.velocity, V2.rotate(V2.create(0, speed), this.t.n_rotation));
             if (V2.magnitude(this.rb.velocity) > maxSpeed) {
                 this.rb.velocity = V2.scale(V2.normalize(this.rb.velocity), maxSpeed);
             }
@@ -138,26 +128,26 @@ function createPlayer(color, x, y, model, keybindings) {
 function drawModelCopies(transform, model) {
     let newTransform = Util.deepClone(transform);
 
-    newTransform.position.x += canvas.clientWidth;
+    newTransform.v2_position.x += canvas.clientWidth;
     drawModel(ctx, newTransform, model);
 
-    newTransform.position.x -= canvas.clientWidth * 2;
+    newTransform.v2_position.x -= canvas.clientWidth * 2;
     drawModel(ctx, newTransform, model);
 
-    newTransform.position.x += canvas.clientWidth;
-    newTransform.position.y -= canvas.clientHeight;
+    newTransform.v2_position.x += canvas.clientWidth;
+    newTransform.v2_position.y -= canvas.clientHeight;
     drawModel(ctx, newTransform, model);
 
-    newTransform.position.y += canvas.clientHeight * 2;
+    newTransform.v2_position.y += canvas.clientHeight * 2;
     drawModel(ctx, newTransform, model);
 }
 
 function update() {
     for(let rb of rigidbodies) {
         rb.update();
-        rb.transform.position = V2.create(
-            Util.loopNumber(0, canvas.clientWidth, rb.transform.position.x), 
-            Util.loopNumber(0, canvas.clientHeight, rb.transform.position.y)
+        rb.transform.v2_position = V2.create(
+            Util.loopNumber(0, canvas.clientWidth, rb.transform.v2_position.x), 
+            Util.loopNumber(0, canvas.clientHeight, rb.transform.v2_position.y)
         );
     }
 }
@@ -184,8 +174,8 @@ function initialiseGameData(playerCount) {
 
 function renderPlayerDebug(player) {
 
-    let pos = player.t.position;
-    let f = player.t.forward();
+    let pos = player.t.v2_position;
+    let f = player.t.forward;
     let v = player.rb.velocity;
 
     ctx.strokeStyle = debugPlayerColor;
@@ -208,7 +198,7 @@ function renderPlayerDebug(player) {
     
     // Debug text. 
     ctx.fillText(`pos: ${Util.roundTo(pos.x, 0)}, ${Util.roundTo(pos.y, 0)}`, 40, -30);
-    ctx.fillText(`rot: ${Util.roundTo(player.t.rotation, 0)}`, 40, 0);
+    ctx.fillText(`rot: ${Util.roundTo(player.t.n_rotation, 0)}`, 40, 0);
     ctx.fillText(`f: ${Util.roundTo(f.x, 2)}, ${Util.roundTo(f.y, 2)}`, 40, 30);
     ctx.fillText(`v: ${Util.roundTo(v.x, 2)}, ${Util.roundTo(v.y, 2)}`, 40, 60);
     ctx.fillText(`rs: ${Util.roundTo(player.rb.rotationSpeed, 2)}`, 40, 90);

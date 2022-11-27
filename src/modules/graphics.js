@@ -30,10 +30,10 @@ const drawTri = function(ctx, tri, color) {
 
 const drawModel = function(ctx, transform, model) {
     ctx.save();
-    ctx.translate(transform.position.x, transform.position.y);
-    ctx.rotate(V2.degToRad(transform.rotation));
+    ctx.translate(transform.v2_position.x, transform.v2_position.y);
+    ctx.rotate(V2.degToRad(transform.n_rotation));
 
-    let scaledModel = scaleModel(model, transform.scale);
+    let scaledModel = scaleModel(model, transform.v2_scale);
 
     for(let tri of scaledModel) {
         drawTri(ctx, tri, tri.color);
