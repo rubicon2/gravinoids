@@ -8,6 +8,7 @@ import processKey from "./modules/input";
 
 import Transform from "./modules/transform";
 import Rigidbody from "./modules/rigidbody";
+import Player from "./modules/player";
 
 let canvas = null;
 let ctx = null;
@@ -73,42 +74,6 @@ function createRGBA(r, g, b, a) {
     }
 }
 
-function createPlayer(color, x, y, model, keybindings) {
-    let newTransform = new Transform(V2.create(x, y), Math.random() * 360, V2.one);
-    return {
-        t: newTransform,
-        rb: new Rigidbody(newTransform, true),
-        model: model,
-        color: color,
-        keys: keybindings,
-        accelerationSpeed: defaultAccelerationSpeed,
-        brakingSpeed: defaultBrakingSpeed,
-        turningSpeed: defaultTurningSpeed,
-
-        accelerate(speed) {
-            this.rb.v2_velocity = V2.add(this.rb.v2_velocity, V2.rotate(V2.create(0, -speed), this.t.n_rotation));
-            if (V2.magnitude(this.rb.v2_velocity) > maxSpeed) {
-                this.rb.v2_velocity = V2.scale(V2.normalize(this.rb.v2_velocity), maxSpeed);
-            }
-        },
-
-        decelerate(speed) {
-            this.rb.v2_velocity = V2.add(this.rb.v2_velocity, V2.rotate(V2.create(0, speed), this.t.n_rotation));
-            if (V2.magnitude(this.rb.v2_velocity) > maxSpeed) {
-                this.rb.v2_velocity = V2.scale(V2.normalize(this.rb.v2_velocity), maxSpeed);
-            }
-        },
-
-        turn(speed) {
-            this.rb.n_rotationSpeed = Util.clamp(-maxRotationSpeed, maxRotationSpeed, this.rb.n_rotationSpeed += speed);
-        },
-
-        action() {
-            // Do something!
-        }
-    }
-}
-
 function drawModelCopies(transform, model) {
     let newTransform = Util.deepClone(transform);
 
@@ -142,13 +107,13 @@ function createPlayers(playerCount) {
     // Not using break on purpose so it cascades down each case. 
     switch(playerCount) {
         case 4:
-            players.push(createPlayer(createRGBA(0, 255, 0, 1), center.x * 0.5, center.y * 0.5, shipModels[1], defaultKeys[3]));
+            new Player(createRGBA(0, 255, 0, 1), center.x * 0.5, center.y * 0.5, shipModels[1], defaultKeys[3]);
         case 3:
-            players.push(createPlayer(createRGBA(0, 0, 255, 1), center.x * 1.5, center.y * 1.5, shipModels[0], defaultKeys[2]));
+            new Player(createRGBA(0, 0, 255, 1), center.x * 1.5, center.y * 1.5, shipModels[0], defaultKeys[2]);
         case 2:
-            players.push(createPlayer(createRGBA(255, 0, 0, 1), center.x * 1.5, center.y * 0.5, shipModels[1], defaultKeys[1]));
+            new Player(createRGBA(255, 0, 0, 1), center.x * 1.5, center.y * 0.5, shipModels[1], defaultKeys[1]);
         default:
-            players.push(createPlayer(createRGBA(255, 0, 255, 1), center.x * 0.5, center.y * 1.5, shipModels[0], defaultKeys[0]));
+            new Player(createRGBA(255, 0, 255, 1), center.x * 0.5, center.y * 1.5, shipModels[0], defaultKeys[0]);
     }
 }
 
@@ -209,7 +174,7 @@ function renderScene() {
     setCanvasSize(canvas, ctx, scale, canvas.clientWidth, canvas.clientHeight);
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
-    for(let player of players) {
+    for(let player of Player.list) {
         drawModel(ctx, player.t, player.model);
         drawModelCopies(player.t, player.model);
     }
@@ -217,7 +182,7 @@ function renderScene() {
     if(debug) {
         timeToRender -= new Date().getTime();
         renderFPS();
-        for(let player of players) {
+        for(let player of Player.list) {
             renderPlayerDebug(player);
         }
     }
@@ -244,7 +209,7 @@ initialiseGameData(2);
 requestAnimationFrame(tick);
 
 window.addEventListener("keydown", function(e) {
-    processKey(players, e);
+    processKey(Player.list, e);
 });
 
 setInterval(() => {
