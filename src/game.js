@@ -6,7 +6,6 @@ import * as V2 from "./modules/vectors";
 import { setCanvasSize, createTri, drawModel } from "./modules/graphics";
 import processKey from "./modules/input";
 
-import Transform from "./modules/transform";
 import Rigidbody from "./modules/rigidbody";
 import Player from "./modules/player";
 
@@ -14,16 +13,6 @@ let canvas = null;
 let ctx = null;
 const scale = window.devicePixelRatio;
 let center = V2.zero; 
-
-const maxSpeed = 5;
-const maxRotationSpeed = 10;
-const defaultAccelerationSpeed = 0.2;
-const defaultBrakingSpeed = 0.5;
-const defaultTurningSpeed = 0.2;
-
-let players = [];
-let stars = [];
-let rigidbodies = [];
 
 let debug = true;
 let debugPlayerColor = "white";
@@ -103,10 +92,10 @@ function update() {
 
 function createPlayers(playerCount) {
     playerCount = Math.min(playerCount, 4);
-    players = [];
     // Not using break on purpose so it cascades down each case. 
     switch(playerCount) {
         case 4:
+            // New players are automatically added to static Player.list. 
             new Player(createRGBA(0, 255, 0, 1), center.x * 0.5, center.y * 0.5, shipModels[1], defaultKeys[3]);
         case 3:
             new Player(createRGBA(0, 0, 255, 1), center.x * 1.5, center.y * 1.5, shipModels[0], defaultKeys[2]);
