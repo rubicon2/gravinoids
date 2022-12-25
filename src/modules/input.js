@@ -1,3 +1,5 @@
+import { getDelta } from "./graphics";
+
 export default function(players, e) {
     for(let p of players) {
         let keys = p.keys;
