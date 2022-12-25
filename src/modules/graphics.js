@@ -181,8 +181,7 @@ const renderToCanvas2D = function() {
     }
 
     millisToRender = new Date().getTime() - renderStartTime;
-
-    console.log(`Delta: ${getDelta()}`);
+    
 }
 
 export {
