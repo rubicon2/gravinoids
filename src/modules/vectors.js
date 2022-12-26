@@ -18,15 +18,15 @@ const left = create(-1, 0);
 const right = create(1, 0);
 
 const add = function(v1, v2) {
-    return this.create(v1.x + v2.x, v1.y + v2.y);
+    return create(v1.x + v2.x, v1.y + v2.y);
 }
 
 const sub = function(v1, v2) {
-    return this.create(v1.x - v2.x, v1.y - v2.y);
+    return create(v1.x - v2.x, v1.y - v2.y);
 };
 
 const scale = function(v1, s) {
-    return this.create(v1.x * s, v1.y * s);
+    return create(v1.x * s, v1.y * s);
 }
 
 const normalize = function(v1) {
@@ -49,7 +49,7 @@ const crossProduct = function(v1, v2) {
 const rotate = function(v, degrees) {
     let cos = Math.cos(degToRad(degrees));
     let sin = Math.sin(degToRad(degrees));
-    return this.create(cos * v.x + -sin * v.y, sin * v.x + cos * v.y);
+    return create(cos * v.x + -sin * v.y, sin * v.x + cos * v.y);
 };
 
 const degToRad = function(deg) {
