@@ -43,7 +43,7 @@ const dot = function(v1, v2) {
 };
 
 const crossProduct = function(v1, v2) {
-    return createVector2(v1.x * v2.y - v1.y * v2.x); 
+    return create(v1.x * v2.y - v1.y * v2.x); 
 };
 
 const rotate = function(v, degrees) {
