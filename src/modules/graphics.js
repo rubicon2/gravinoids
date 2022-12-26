@@ -9,11 +9,33 @@ let millisToRender = 0;
 
 let renderList = [];
 
+let defaultTextStyle = {
+    font: "24px Arial",
+    strokeStyle: "white",
+    fillStyle: "white"
+}
+
+class RenderLayer {
+    constructor(renderOrder, name, isVisible) {
+        this.renderOrder = renderOrder;
+        this.name = name;
+        this.isVisible = isVisible;
+    }
+}
+
+let layers = {
+    background: new RenderLayer(0, "background", true),
+    game: new RenderLayer(1, "game", true),
+    ui: new RenderLayer(2, "ui", true),
+    debug: new RenderLayer(3, "debug", true)
+}
+
 class RenderItem {
-    constructor(renderLayer, transform, renderContent) {
-        this.layer = renderLayer;
+    constructor(transform, renderContent, renderLayer = layers.game, isVisible = true) {
         this.transform = transform;
         this.content = renderContent;
+        this.layer = renderLayer;
+        this.isVisible = isVisible;
     }
 }
 
@@ -87,8 +109,6 @@ const getFPS = function() {
 const addToRenderList = function(renderItem) {
     if (!renderList.includes(renderItem))
         renderList.push(renderItem);
-    console.log("Updated render list:");
-    console.table(renderList);
 }
 
 const removeFromRenderList = function(renderItem) {
@@ -142,52 +162,69 @@ const renderText = function(renderItem) {
 
     ctx.save();
 
-    if (content.strokeStyle != undefined)
-        ctx.strokeStyle = content.strokeStyle;
-    
-    if (content.fillStyle != undefined)
-        ctx.fillStyle = content.fillStyle;
-
-    if (content.font != undefined)
-        ctx.font = content.font;
+    ctx.strokeStyle = content.strokeStyle != undefined ? content.strokeStyle : defaultTextStyle.strokeStyle;
+    ctx.fillStyle = content.fillStyle != undefined ? content.fillStyle : defaultTextStyle.fillStyle;
+    ctx.font = content.font != undefined ? content.font : defaultTextStyle.font;
 
     ctx.fillText(`${content.text}`, transform.v2_position.x, transform.v2_position.y);
 
     ctx.restore();
 }
 
+const renderRenderItem = function(renderItem) {
+    let content = renderItem.content;
+    if (content.text != undefined) {
+        renderText(renderItem); 
+    } else if (content.mesh != undefined) {
+        renderMesh(renderItem);
+    } else {
+        console.error(`RenderItem has no valid content to render.`);
+        console.error(new Error().stack);
+    }
+}
+
 const renderToCanvas2D = function() {
 
     let renderStartTime = new Date().getTime();
 
-    // Sort into renderLayer order
-    renderList.sort(function(a, b) {
-        return a.layer > b.layer;
+    // Filter renderList by visible layers only
+    let visibleOnly = renderList.filter(function (e) {
+        return e.layer.isVisible && e.isVisible;
     });
+
+    // Sort what remains into renderLayer order
+    visibleOnly.sort(function(a, b) {
+        return a.layer.renderOrder > b.layer.renderOrder;
+    });
+
+    // Sort into renderLayer order
+    // renderList.sort(function(a, b) {
+    //     return a.layer.renderOrder > b.layer.renderOrder;
+    // });
+
+    
 
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     // Go through all items in "renderList" and call the appropriate function to draw it, depending on the content
-    for (let renderItem of renderList) {
-        let content = renderItem.content;
-        if (content.text != undefined) {
-            renderText(renderItem);
-            continue;
-        }
-        if (content.mesh != undefined) {
-            renderMesh(renderItem);
-            continue;
-        }
+    // for (let renderItem of renderList) {
+    //     renderRenderItem(renderItem);
+    // }
+
+    for (let renderItem of visibleOnly) {
+        renderRenderItem(renderItem);
     }
 
     millisToRender = new Date().getTime() - renderStartTime;
-    
+
 }
 
 export {
     RenderItem,
     Mesh,
     Polygon,
+
+    layers,
 
     getCanvasSize,
     getCenter,

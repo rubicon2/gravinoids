@@ -8,6 +8,7 @@ import processKey from "./modules/input";
 
 import Rigidbody from "./modules/rigidbody";
 import Player from "./modules/player";
+import Transform from "./modules/transform";
 
 let defaultKeys = [
     {
@@ -152,5 +153,7 @@ window.addEventListener("keydown", function(e) {
     processKey(Player.list, e);
 });
 
-Gfx.addToRenderList(new Gfx.RenderItem(0, Player.list[0].t, { mesh: Player.list[0].mesh }))
-Gfx.addToRenderList(new Gfx.RenderItem(0, Player.list[1].t, { mesh: Player.list[1].mesh }))
+Gfx.addToRenderList(new Gfx.RenderItem(Player.list[0].t, { mesh: Player.list[0].mesh }))
+Gfx.addToRenderList(new Gfx.RenderItem(Player.list[1].t, { mesh: Player.list[1].mesh }))
+
+Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.create(50, 50), 0, V2.one), { text: "wow!" }, Gfx.layers.debug))
