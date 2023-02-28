@@ -1,6 +1,5 @@
 import * as V2 from "./vectors";
 import * as Util from "./util";
-import { getDelta } from "./graphics";
 
 export default class Rigidbody {
 
@@ -23,7 +22,7 @@ export default class Rigidbody {
 
     update() {
         this.v2_velocity = V2.add(this.v2_velocity, this.v2_acceleration);
-        this.transform.v2_position = V2.add(this.transform.v2_position, V2.scale(this.v2_velocity, getDelta()));
-        this.transform.n_rotation = Util.loopNumber(0, 360, this.transform.n_rotation + (this.n_rotationSpeed * getDelta()));
+        this.transform.v2_position = V2.add(this.transform.v2_position, this.v2_velocity);
+        this.transform.n_rotation = Util.loopNumber(0, 360, this.transform.n_rotation + this.n_rotationSpeed);
     };
 }

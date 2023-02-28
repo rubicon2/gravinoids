@@ -3,6 +3,7 @@ require("./styles.css");
 import * as Util from "./modules/util";
 import * as V2 from "./modules/vectors";
 import * as Gfx from "./modules/graphics";
+import { publish } from "./modules/pubsub";
 
 import processKey from "./modules/input";
 
@@ -140,9 +141,15 @@ function initialiseGameData(playerCount) {
 // }
 
 function tick() {
+    // onTickStart/End will be used to calculate time to finish one tick, 
+    // i.e. delta time
+    publish('onTickStart');
+
     update();
-    Gfx.renderToCanvas2D();
+    Gfx.renderScene2D();
     requestAnimationFrame(tick);
+
+    publish('onTickEnd');
 }
 
 Gfx.createCanvas();

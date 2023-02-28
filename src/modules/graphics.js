@@ -1,11 +1,11 @@
 import * as V2 from "./vectors";
+import { publish } from "./pubsub";
 
 let canvas = null;
 let ctx = null;
 let v2_center = V2.zero;
 
 let scale = window.devicePixelRatio;
-let millisToRender = 0;
 
 let renderList = [];
 
@@ -97,23 +97,18 @@ const getCenter = function() {
     return v2_center;
 }
 
-const getDelta = function() {
-    // Return how long it took to render in seconds (hopefully this is something like 0.001 etc.)
-    return millisToRender / 1000;
-}
-
-const getFPS = function() {
-    return Math.round(1000 / Math.abs(millisToRender));
-}
-
 const addToRenderList = function(renderItem) {
     if (!renderList.includes(renderItem))
         renderList.push(renderItem);
+    publish('onAddToRenderList', renderItem);
+    publish('onRenderListChange', renderList);
 }
 
 const removeFromRenderList = function(renderItem) {
     if (renderList.includes(renderItem))
         renderList.splice(renderList.indexOf(renderItem), 1);
+    publish('onRemoveFromRenderList', renderItem);
+    publish('onRenderListChange', renderList);
 }
 
 const renderMesh = function(renderItem) {
@@ -183,10 +178,7 @@ const renderRenderItem = function(renderItem) {
     }
 }
 
-const renderToCanvas2D = function() {
-
-    let renderStartTime = new Date().getTime();
-
+const renderScene2D = function() {
     // Filter renderList by visible layers only
     let visibleOnly = renderList.filter(function (e) {
         return e.layer.isVisible && e.isVisible;
@@ -202,8 +194,6 @@ const renderToCanvas2D = function() {
     //     return a.layer.renderOrder > b.layer.renderOrder;
     // });
 
-    
-
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     // Go through all items in "renderList" and call the appropriate function to draw it, depending on the content
@@ -214,9 +204,6 @@ const renderToCanvas2D = function() {
     for (let renderItem of visibleOnly) {
         renderRenderItem(renderItem);
     }
-
-    millisToRender = new Date().getTime() - renderStartTime;
-
 }
 
 export {
@@ -228,12 +215,10 @@ export {
 
     getCanvasSize,
     getCenter,
-    getDelta,
-    getFPS,
 
     createCanvas,
     setCanvasSize,
     addToRenderList,
     removeFromRenderList,
-    renderToCanvas2D
+    renderScene2D
 }

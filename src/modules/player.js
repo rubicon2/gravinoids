@@ -11,16 +11,11 @@ export default class Player {
     mesh = undefined;
     keybindings = undefined;
 
-    n_accelerationSpeed = 100;
-    n_brakingSpeed = 0.2;
-    n_turningSpeed = 100;
+    n_accelerationSpeed = 0.3;
+    n_turningSpeed = 0.2;
 
-    n_maxAccelerationSpeed = 200;
-    n_maxBrakingSpeed = 200;
-    n_maxTurningSpeed = 100;
-
-    n_maxVelocity = 2000;
-    n_maxAngularVelocity = 1000;
+    n_maxVelocity = 10;
+    n_maxAngularVelocity = 6;
 
     constructor(color, x, y, mesh, keybindings) {
         this.t = new Transform(V2.create(x, y), 0, V2.one);
