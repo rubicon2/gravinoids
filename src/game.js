@@ -161,6 +161,7 @@ window.addEventListener("keydown", function(e) {
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[0].t, { mesh: Player.list[0].mesh }))
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[1].t, { mesh: Player.list[1].mesh }))
 
-let t_debugPanel = new Transform(V2.create(50, 50), 0, V2.one, Player.list[0].t);
+let t_debugPanel = new Transform(V2.create(50, 0), 0, V2.one, Player.list[0].t);
+t_debugPanel.freeze_rotation = true;
 Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.zero, 0, V2.one, t_debugPanel), { text: () => { return new Date().getTime(); } }, Gfx.layers.debug));
 Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.create(0, 25), 45, V2.one, t_debugPanel), { text: "It's a turnip!" }, Gfx.layers.debug))

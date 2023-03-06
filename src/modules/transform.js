@@ -9,6 +9,8 @@ export default class Transform {
     n_localRotation = 0;
     v2_scale = V2.one;
 
+    freeze_rotation = false;
+
     constructor(v2_localPosition, n_localRotation, v2_localScale, t_parent) {
         this.v2_localPosition = v2_localPosition;
         this.n_localRotation = n_localRotation;
@@ -19,13 +21,16 @@ export default class Transform {
 
     get v2_position() {
         if (this.t_parent != null) {
-            return V2.add(this.t_parent.v2_position, V2.rotate(this.v2_localPosition, this.t_parent.n_rotation));
+            if (this.freeze_rotation)
+                return V2.add(this.t_parent.v2_position, this.v2_localPosition);
+            else
+                return V2.add(this.t_parent.v2_position, V2.rotate(this.v2_localPosition, this.t_parent.n_rotation));
         } else 
             return this.v2_localPosition;
     }
 
     get n_rotation() {
-        if (this.t_parent != null)
+        if (this.t_parent != null && !this.freeze_rotation)
             return this.t_parent.n_rotation + this.n_localRotation;
         else
             return this.n_localRotation;
