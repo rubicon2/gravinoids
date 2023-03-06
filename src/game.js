@@ -67,7 +67,7 @@ function update() {
     for(let rb of Rigidbody.list) {
         rb.update();
         // Loop position within play area
-        rb.transform.v2_position = V2.create(
+        rb.transform.v2_localPosition = V2.create(
             Util.loopNumber(0, canvasSize.x, rb.transform.v2_position.x), 
             Util.loopNumber(0, canvasSize.y, rb.transform.v2_position.y)
         );
@@ -141,8 +141,6 @@ function initialiseGameData(playerCount) {
 // }
 
 function tick() {
-    // onTickStart/End will be used to calculate time to finish one tick, 
-    // i.e. delta time
     publish('onTickStart');
 
     update();
@@ -163,4 +161,6 @@ window.addEventListener("keydown", function(e) {
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[0].t, { mesh: Player.list[0].mesh }))
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[1].t, { mesh: Player.list[1].mesh }))
 
-Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.create(50, 50), 0, V2.one), { text: "wow!" }, Gfx.layers.debug))
+let t_debugPanel = new Transform(V2.create(50, 50), 0, V2.one, Player.list[0].t);
+Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.zero, 0, V2.one, t_debugPanel), { text: () => { return new Date().getTime(); } }, Gfx.layers.debug));
+Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.create(0, 25), 45, V2.one, t_debugPanel), { text: "It's a turnip!" }, Gfx.layers.debug))

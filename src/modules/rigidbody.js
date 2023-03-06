@@ -22,7 +22,7 @@ export default class Rigidbody {
 
     update() {
         this.v2_velocity = V2.add(this.v2_velocity, this.v2_acceleration);
-        this.transform.v2_position = V2.add(this.transform.v2_position, this.v2_velocity);
-        this.transform.n_rotation = Util.loopNumber(0, 360, this.transform.n_rotation + this.n_rotationSpeed);
+        this.transform.v2_localPosition = V2.add(this.transform.v2_position, this.v2_velocity);
+        this.transform.n_localRotation = Util.loopNumber(0, 360, this.transform.n_rotation + this.n_rotationSpeed);
     };
 }

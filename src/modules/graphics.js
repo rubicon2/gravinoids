@@ -154,14 +154,22 @@ const renderText = function(renderItem) {
 
     let transform = renderItem.transform;
     let content = renderItem.content;
+    
+    let text = 'empty string';
+    if (typeof content.text === 'function') 
+        text = content.text();
+    else
+        text = content.text;
 
     ctx.save();
+    ctx.translate(transform.v2_position.x, transform.v2_position.y);
+    ctx.rotate(V2.degToRad(transform.n_rotation));
 
     ctx.strokeStyle = content.strokeStyle != undefined ? content.strokeStyle : defaultTextStyle.strokeStyle;
     ctx.fillStyle = content.fillStyle != undefined ? content.fillStyle : defaultTextStyle.fillStyle;
     ctx.font = content.font != undefined ? content.font : defaultTextStyle.font;
 
-    ctx.fillText(`${content.text}`, transform.v2_position.x, transform.v2_position.y);
+    ctx.fillText(`${text}`, 0, 0);
 
     ctx.restore();
 }
