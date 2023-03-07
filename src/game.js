@@ -95,51 +95,6 @@ function initialiseGameData(playerCount) {
     createPlayers(playerCount); 
 }
 
-// function renderPlayerDebug(player) {
-
-//     let pos = player.t.v2_position;
-//     let f = player.t.forward;
-//     let v = player.rb.v2_velocity;
-
-//     ctx.strokeStyle = debugPlayerColor;
-//     ctx.fillStyle = debugPlayerColor;
-//     ctx.font = "24px Arial";
-
-//     // Draw forward direction.
-//     ctx.beginPath();
-//     ctx.moveTo(pos.x, pos.y);
-//     ctx.lineTo(pos.x + f.x * scale * 40, pos.y + f.y * scale * 40);
-//     ctx.closePath();
-//     ctx.stroke();
-
-//     //ctx.moveTo(pos.x, pos.y);
-//     ctx.arc(pos.x, pos.y, scale * 25, 0, 2 * Math.PI);
-//     ctx.stroke();
-
-//     ctx.save(); 
-//     ctx.translate(pos.x, pos.y);
-    
-//     // Debug text. 
-//     ctx.fillText(`pos: ${Util.roundTo(pos.x, 0)}, ${Util.roundTo(pos.y, 0)}`, 40, -30);
-//     ctx.fillText(`rot: ${Util.roundTo(player.t.n_rotation, 0)}`, 40, 0);
-//     ctx.fillText(`f: ${Util.roundTo(f.x, 2)}, ${Util.roundTo(f.y, 2)}`, 40, 30);
-//     ctx.fillText(`v: ${Util.roundTo(v.x, 2)}, ${Util.roundTo(v.y, 2)}`, 40, 60);
-//     ctx.fillText(`rs: ${Util.roundTo(player.rb.n_rotationSpeed, 2)}`, 40, 90);
-
-//     ctx.restore();
-// }
-
-// function renderFPS() {
-//     ctx.save();
-//     ctx.strokeStyle = debugPlayerColor;
-//     ctx.fillStyle = debugPlayerColor;
-//     ctx.font = "24px Arial";
-
-//     ctx.fillText(`${fps}`, 10, 30);
-
-//     ctx.restore();
-// }
-
 function tick() {
     publish('onTickStart');
 
@@ -158,10 +113,24 @@ window.addEventListener("keydown", function(e) {
     processKey(Player.list, e);
 });
 
+function createPlayerDebugPanel(player) {
+    let t_debugPanel = new Transform(V2.create(50, -42.5), 0, V2.one, player.t);
+    t_debugPanel.freeze_rotation = true;
+
+    const lineGap = 25;
+
+    let positionInfo = new Gfx.RenderItem(new Transform(V2.zero, 0, V2.one, t_debugPanel), { text: () => { return `x: ${Math.round(player.t.v2_position.x)}, y: ${Math.round(player.t.v2_position.y)}`; } }, Gfx.layers.debug);
+    let velocityInfo = new Gfx.RenderItem(new Transform(V2.create(0, lineGap), 0, V2.one, t_debugPanel), { text: () => { return `vx: ${Util.roundTo(player.rb.v2_velocity.x, 2)}, vy: ${Util.roundTo(player.rb.v2_velocity.y, 2)}`} }, Gfx.layers.debug);
+    let rotationInfo = new Gfx.RenderItem(new Transform(V2.create(0, lineGap * 2), 0, V2.one, t_debugPanel), { text: () => { return `r: ${Math.round(player.t.n_rotation)}` } }, Gfx.layers.debug);
+    let rotationSpeedInfo = new Gfx.RenderItem(new Transform(V2.create(0, lineGap * 3), 0, V2.one, t_debugPanel), { text: () => { return `rs: ${Util.roundTo(player.rb.n_rotationSpeed, 2)}` } }, Gfx.layers.debug);
+
+    Gfx.addToRenderList(positionInfo);
+    Gfx.addToRenderList(velocityInfo);
+    Gfx.addToRenderList(rotationInfo);
+    Gfx.addToRenderList(rotationSpeedInfo);
+}
+
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[0].t, { mesh: Player.list[0].mesh }))
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[1].t, { mesh: Player.list[1].mesh }))
-
-let t_debugPanel = new Transform(V2.create(50, 0), 0, V2.one, Player.list[0].t);
-t_debugPanel.freeze_rotation = true;
-Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.zero, 0, V2.one, t_debugPanel), { text: () => { return new Date().getTime(); } }, Gfx.layers.debug));
-Gfx.addToRenderList(new Gfx.RenderItem(new Transform(V2.create(0, 25), 45, V2.one, t_debugPanel), { text: "It's a turnip!" }, Gfx.layers.debug))
+createPlayerDebugPanel(Player.list[0]);
+createPlayerDebugPanel(Player.list[1]);
