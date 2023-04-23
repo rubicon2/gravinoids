@@ -5,7 +5,7 @@ import * as V2 from "./modules/vectors";
 import * as Gfx from "./modules/graphics";
 import { publish } from "./modules/pubsub";
 
-import processKey from "./modules/input";
+import * as Input from "./modules/input";
 
 import Rigidbody from "./modules/rigidbody";
 import Player from "./modules/player";
@@ -110,8 +110,15 @@ initialiseGameData(2);
 requestAnimationFrame(tick);
 
 window.addEventListener("keydown", function(e) {
-    processKey(Player.list, e);
+    if (!e.repeat) {
+        // Input.oldHandler(Player.list, e);
+        Input.handleKeyPress(e);
+    }
 });
+
+window.addEventListener("keyup", function(e) {
+    Input.handleKeyUp(e);
+})
 
 function createPlayerDebugPanel(player) {
     let t_debugPanel = new Transform(V2.create(50, -42.5), 0, V2.one, player.t);
@@ -134,3 +141,31 @@ Gfx.addToRenderList(new Gfx.RenderItem(Player.list[0].t, { mesh: Player.list[0].
 Gfx.addToRenderList(new Gfx.RenderItem(Player.list[1].t, { mesh: Player.list[1].mesh }))
 createPlayerDebugPanel(Player.list[0]);
 createPlayerDebugPanel(Player.list[1]);
+
+let p0 = Player.list[0];
+
+// Input.addBindingSet('Player_0', new Map([
+//     [p0.keys.left, p0.turn.bind(p0, -p0.n_turningSpeed)],
+//     [p0.keys.right, p0.turn.bind(p0, p0.n_turningSpeed)],
+//     [p0.keys.up, p0.accelerate.bind(p0, p0.n_accelerationSpeed)],
+//     [p0.keys.down, p0.decelerate.bind(p0, p0.n_accelerationSpeed)]
+// ]))
+
+Input.addBinding(p0.keys.left, p0.turn.bind(p0, -p0.n_turningSpeed));
+Input.addBinding(p0.keys.right, p0.turn.bind(p0, p0.n_turningSpeed));
+Input.addBinding(p0.keys.up, p0.accelerate.bind(p0, p0.n_accelerationSpeed));
+Input.addBinding(p0.keys.down, p0.decelerate.bind(p0, p0.n_accelerationSpeed));
+
+let p1 = Player.list[1];
+
+// Input.addBindingSet('Player_0', new Map([
+//     [p1.keys.left, p1.turn.bind(p1, -p1.n_turningSpeed)],
+//     [p1.keys.right, p1.turn.bind(p1, p1.n_turningSpeed)],
+//     [p1.keys.up, p1.accelerate.bind(p1, p1.n_accelerationSpeed)],
+//     [p1.keys.down, p1.decelerate.bind(p1, p1.n_accelerationSpeed)]
+// ]))
+
+Input.addBinding(p1.keys.left, p1.turn.bind(p1, -p1.n_turningSpeed));
+Input.addBinding(p1.keys.right, p1.turn.bind(p1, p1.n_turningSpeed));
+Input.addBinding(p1.keys.up, p1.accelerate.bind(p1, p1.n_accelerationSpeed));
+Input.addBinding(p1.keys.down, p1.decelerate.bind(p1, p1.n_accelerationSpeed));

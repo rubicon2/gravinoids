@@ -23,6 +23,11 @@ const roundTo = function(float, digits) {
     return float /= digits;
 };
 
+const removeWhitespace = function(string) {
+    let chars = string.toLowerCase().split('');
+    return chars.filter((e) => e != ' ');
+}
+
 const shuffleArray = function(array) {
 
     let copy = array.slice();
