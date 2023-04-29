@@ -1,63 +1,99 @@
-let bindingSets = new Map();
-// inputSequence: { actions: [functions], userInputs: "" }
-let bindings = new Map();
+// When a binding is created, keyboard code will be extracted and set here
+// corresponding value will be an array of the input sequences that are interested in that keycode
+import { loopInt } from "./util";
 
-let activeBindingSet = null;
+class InputController {
 
-// User input sequences are stored in here, arranged by what binding they relate to.
-// Once input sequence matches a binding, it will trigger the function relating to it!
-let userInputs = [];
+    // Points the way for the key event to the correct binding group
+    static boundInputs = new Map(); 
+    // E.g. each player has their own group
+    static bindingGroups = new Map();
 
-// Want a flexible system like this, kind of like a regex... 
-// Press F twice, then press either A, B or C simultaneously with E, F or G.
-// KeyF{2} > ([KeyA|KeyB|KeyC] + [KeyE|KeyF|KeyG])
-// Could use inputs to generate a regex like this, and match the result with the regex strings assigned to each binding? 
-// But with multiple players, would be messy. 
-// When input happens, filter so it only applies to active binding sets, on the appropriate player, on the relevant binding.
-function addBindingSet(name, bindings) {
-    if (bindingSets.has(name)) {
-        console.info(`Binding set overwritten: ${name}`);
-    } else {
-        console.info(`New binding set added: ${name}`);
+    static addBindingGroup(groupName, isActive, inputSequences) {
+        if (!this.bindingGroups.has(groupName)) {
+            this.bindingGroups.set(groupName, { isActive, inputSequences });
+            inputSequences.forEach(inputSeq => {
+                let inputs = inputSeq.getAllInputs();
+                inputs.forEach(input => {
+                    if (!this.boundInputs.has(input)) {
+                        this.boundInputs.set(input, groupName);
+                    } else {
+                        console.warn(`Attempted to overwrite ${input}`);
+                    }
+                });
+            });
+        } else {
+            console.warn(`Attempted to overwrite binding group ${groupName}`);
+        }
+    } 
+
+    static createBoundInputKey(event) {
+        return `${event.type} ${event.code}`;
     }
-    bindingSets.set(bindings);
+
+    static #getAssociatedInputGroup(event) {
+        let groupName = this.boundInputs.get(this.createBoundInputKey(event));
+        return this.bindingGroups.get(groupName);  
+    }
+
+    static handleKeyDown(event) {
+        if (this.boundInputs.has(this.createBoundInputKey(event))) {
+            for (let inputSequence of this.#getAssociatedInputGroup(event).inputSequences) {
+                inputSequence.handleInput(event);
+            }
+        }
+    }
+
+    static handleKeyUp(event) {
+        if (this.boundInputs.has(this.createBoundInputKey(event))) {
+            for (let inputSequence of this.#getAssociatedInputGroup(event).inputSequences) {
+                inputSequence.handleInput(event);
+            }
+        }
+    }
+
 }
 
-function addBinding(inputSequence, fn) {
-    if (bindings.has(inputSequence)) {
-        console.info(`Function added to existing binding actions: ${inputSequence} \n ${fn}`);
-        bindings.get(inputSequence).actions.push(fn);
-    } else {
-        console.info(`New action added to binding: ${inputSequence} \n ${fn}`);
-        bindings.set(inputSequence, { actions: [fn] });
+class InputSequence {
+
+    #inputStage = 0;
+
+    // inputs e.g. an array of key events
+    // onInputBreak e.g. a function triggered when sequence fails
+    constructor(inputs, onInputBreak = null) {
+        this.inputs = inputs;
+        this.onInputBreak = onInputBreak;
+    }
+
+    handleInput(event) {
+        let code = event.code;
+        let nextInput = this.inputs[this.#inputStage];
+        if (nextInput.code === code) {
+            if (nextInput.action)
+                nextInput.action();
+            this.#inputStage = loopInt(0, this.inputs.length, this.#inputStage + 1);
+        } else {
+            this.#inputStage = 0;
+        }
+    }
+
+    getAllInputs() {
+        return this.inputs.map(e => InputController.createBoundInputKey(e));
     }
 }
 
-function handleKeyPress(event) {
-    let code = event.code;
-    if (bindings.has(code)) {
-        // Get paired functions and execute
-        bindings.get(code).actions.forEach(fn => {
-            fn();
-        });
+class KeyEvent {
+    // type e.g. keydown, hold, keyup
+    // action e.g. a function to call when the key event happens
+    constructor(type, code, action = null) {
+        this.type = type;
+        this.code = code;
+        this.action = action;
     }
-    // Add onto appropriate string, also add the current time so we know the delay between inputs
-    userInputs.push({ code, time: new Date().getTime()})
-
-
-} 
-
-function handleKeyUp(event) {
-    // Remove from list
-    userInputs = userInputs.filter((input) => {
-        return input.code != event.code;
-    });
-    console.log(userInputs);
 }
 
 export {
-    addBindingSet,
-    addBinding,
-    handleKeyPress,
-    handleKeyUp
+    InputController,
+    InputSequence,
+    KeyEvent
 }

@@ -5,7 +5,7 @@ import * as V2 from "./modules/vectors";
 import * as Gfx from "./modules/graphics";
 import { publish } from "./modules/pubsub";
 
-import * as Input from "./modules/input";
+import { InputController, InputSequence, KeyEvent } from "./modules/input"; 
 
 import Rigidbody from "./modules/rigidbody";
 import Player from "./modules/player";
@@ -112,12 +112,12 @@ requestAnimationFrame(tick);
 window.addEventListener("keydown", function(e) {
     if (!e.repeat) {
         // Input.oldHandler(Player.list, e);
-        Input.handleKeyPress(e);
+        InputController.handleKeyDown(e);
     }
 });
 
 window.addEventListener("keyup", function(e) {
-    Input.handleKeyUp(e);
+    InputController.handleKeyUp(e);
 })
 
 function createPlayerDebugPanel(player) {
@@ -151,10 +151,10 @@ let p0 = Player.list[0];
 //     [p0.keys.down, p0.decelerate.bind(p0, p0.n_accelerationSpeed)]
 // ]))
 
-Input.addBinding(p0.keys.left, p0.turn.bind(p0, -p0.n_turningSpeed));
-Input.addBinding(p0.keys.right, p0.turn.bind(p0, p0.n_turningSpeed));
-Input.addBinding(p0.keys.up, p0.accelerate.bind(p0, p0.n_accelerationSpeed));
-Input.addBinding(p0.keys.down, p0.decelerate.bind(p0, p0.n_accelerationSpeed));
+// Input.addBinding(p0.keys.left, p0.turn.bind(p0, -p0.n_turningSpeed));
+// Input.addBinding(p0.keys.right, p0.turn.bind(p0, p0.n_turningSpeed));
+// Input.addBinding(p0.keys.up, p0.accelerate.bind(p0, p0.n_accelerationSpeed));
+// Input.addBinding(p0.keys.down, p0.decelerate.bind(p0, p0.n_accelerationSpeed));
 
 let p1 = Player.list[1];
 
@@ -165,7 +165,17 @@ let p1 = Player.list[1];
 //     [p1.keys.down, p1.decelerate.bind(p1, p1.n_accelerationSpeed)]
 // ]))
 
-Input.addBinding(p1.keys.left, p1.turn.bind(p1, -p1.n_turningSpeed));
-Input.addBinding(p1.keys.right, p1.turn.bind(p1, p1.n_turningSpeed));
-Input.addBinding(p1.keys.up, p1.accelerate.bind(p1, p1.n_accelerationSpeed));
-Input.addBinding(p1.keys.down, p1.decelerate.bind(p1, p1.n_accelerationSpeed));
+// Input.addBinding(p1.keys.left, p1.turn.bind(p1, -p1.n_turningSpeed));
+// Input.addBinding(p1.keys.right, p1.turn.bind(p1, p1.n_turningSpeed));
+// Input.addBinding(p1.keys.up, p1.accelerate.bind(p1, p1.n_accelerationSpeed));
+// Input.addBinding(p1.keys.down, p1.decelerate.bind(p1, p1.n_accelerationSpeed));
+
+InputController.addBindingGroup('playerOne', true, [
+    new InputSequence([
+        new KeyEvent('keydown', 'KeyW', () => console.log('1st key in sequence triggered!')),
+        new KeyEvent('keydown', 'KeyS', () => console.log('2nd key in sequence triggered!!'))
+    ], null),
+    new InputSequence([
+        new KeyEvent('keydown', 'KeyA', () => console.log('Different key event triggered!'))
+    ], null),
+])
