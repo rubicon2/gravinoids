@@ -191,5 +191,9 @@ InputController.addBindingGroup('cheats', true, [
         new KeyEvent('KeyI'),
         new KeyEvent('KeyU'),
         new KeyEvent('KeyY', 'keydown', () => alert('Debug!'))
+    ]),
+    new InputSequence([
+        new KeyEvent('KeyP'),
+        new KeyEvent('KeyP', 'keydown', () => alert('Double press detected!'))
     ])
 ]);
