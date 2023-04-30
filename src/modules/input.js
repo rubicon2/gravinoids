@@ -2,6 +2,8 @@
 // corresponding value will be an array of the input sequences that are interested in that keycode
 import { loopInt } from "./util";
 
+const standardInputTimeout = 500;
+
 class InputController {
 
     // Points the way for the key event to the correct binding group
@@ -57,6 +59,7 @@ class InputController {
 class InputSequence {
 
     #inputStage = 0;
+    #timeout = null;
 
     // inputs e.g. an array of key events
     // onInputBreak e.g. a function triggered when sequence fails
@@ -68,11 +71,20 @@ class InputSequence {
     handleInput(event) {
         let code = event.code;
         let nextInput = this.inputs[this.#inputStage];
+        // If input matches expected next input in sequence
         if (nextInput.code === code) {
             if (nextInput.action)
                 nextInput.action();
             this.#inputStage = loopInt(0, this.inputs.length, this.#inputStage + 1);
+        // If user is pressing the first key in sequence more than once
+        } else if (this.inputs[0].code === code) {
+            if (this.inputs[0].action)
+                this.inputs[0].action();
+            this.#inputStage = loopInt(0, this.inputs.length, 1);
+        // Sequence must be broken, reset
         } else {
+            if (this.onInputBreak)
+                this.onInputBreak();
             this.#inputStage = 0;
         }
     }
@@ -85,10 +97,11 @@ class InputSequence {
 class KeyEvent {
     // type e.g. keydown, hold, keyup
     // action e.g. a function to call when the key event happens
-    constructor(type, code, action = null) {
-        this.type = type;
+    constructor(code, type = 'keydown', action = null, timeout = standardInputTimeout) {
         this.code = code;
+        this.type = type;
         this.action = action;
+        this.timeout = timeout;
     }
 }
 
