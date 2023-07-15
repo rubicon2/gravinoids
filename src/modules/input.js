@@ -1,10 +1,10 @@
-// When a binding is created, keyboard code will be extracted and set here
-// corresponding value will be an array of the input sequences that are interested in that keycode
 import { loopInt } from './util';
 
 const slowInputTimeout = 750;
 const standardInputTimeout = 600;
 const fastInputTimeout = 500;
+
+const inputSetTimeout = 20;
 
 class InputController {
     // Points the way for the key event to the correct binding group
@@ -70,7 +70,8 @@ class InputController {
 
 class InputSequence {
     #inputStage = 0;
-    #timeout = null;
+    #inputSet = new Set();
+    #inputStageTimeout = null;
 
     // inputs e.g. an array of key events
     // onInputBreak e.g. a function triggered when sequence fails
@@ -81,32 +82,49 @@ class InputSequence {
 
     handleInput(event) {
         let code = event.code;
-        let nextInput = this.inputs[this.#inputStage];
-        // If input matches expected next input in sequence
-        if (nextInput.codeSet.has(code)) {
-            if (nextInput.action) nextInput.action();
-            this.#inputStage = loopInt(
-                0,
-                this.inputs.length,
-                this.#inputStage + 1
-            );
-            // If next input not detected before timeout triggers, sequence will be reset
-            this.#setNewInputTimeout(nextInput.timeout);
-            // If user is pressing the first key in sequence more than once
-        } else if (this.inputs[0].codeSet.has(code)) {
-            let firstInput = this.inputs[0];
-            if (firstInput.action) firstInput.action();
-            this.#inputStage = loopInt(0, this.inputs.length, 1);
-            this.#setNewInputTimeout(firstInput.timeout);
-            // If event code does not match next expected input or first input, and inputStage is not zero, sequence must be broken, reset
-        } else if (this.#inputStage != 0) {
-            this.#handleInputBreak();
+        let type = event.type;
+
+        let expectedInput = this.inputs[this.#inputStage];
+
+        if (expectedInput.type === type) {
+            // i.e. keydown or keyup
+            if (expectedInput.codeSet.has(code)) this.#addToInputSet(code);
+            else if (this.inputs[0].codeSet.has(code)) {
+                this.#resetInputStage();
+                this.#addToInputSet(code);
+            }
+        } else if (expectedInput.type === 'hold') {
+            // 'hold' needs to deal with keydown and keyup events
         }
     }
 
-    #setNewInputTimeout(time) {
-        clearTimeout(this.#timeout);
-        this.#timeout = setTimeout(this.#handleInputBreak.bind(this), time);
+    #addToInputSet(code) {
+        let expectedInput = this.inputs[this.#inputStage];
+        this.#inputSet.add(code);
+        if (expectedInput.codeSet.size === this.#inputSet.size) {
+            this.#advanceInputStage();
+        } else setTimeout(() => this.#inputSet.delete(code), inputSetTimeout);
+    }
+
+    #advanceInputStage() {
+        let currentInputStage = this.inputs[this.#inputStage];
+        if (currentInputStage.action) currentInputStage.action();
+        this.#inputStage = loopInt(0, this.inputs.length, this.#inputStage + 1);
+        this.#inputSet.clear();
+        this.#setNewInputStageTimeout(nextInput.timeout);
+    }
+
+    #setNewInputStageTimeout(time) {
+        clearTimeout(this.#inputStageTimeout);
+        this.#inputStageTimeout = setTimeout(
+            this.#handleInputBreak.bind(this),
+            time
+        );
+    }
+
+    #resetInputStage() {
+        this.#inputStage = 0;
+        this.#inputSet.clear();
     }
 
     #handleInputBreak() {

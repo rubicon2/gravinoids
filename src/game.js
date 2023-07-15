@@ -322,11 +322,10 @@ InputController.addBindingGroup('cheats', true, [
         ),
     ]),
     new InputSequence([
-        new KeyEvent(['KeyP', 'KeyO']),
-        new KeyEvent(['KeyP', 'KeyO'], 'keydown', () =>
-            alert('Double press detected!')
+        new KeyEvent(['KeyO', 'KeyP'], 'keydown', () =>
+            alert('Simultaneous double press detected!')
         ),
     ]),
 ]);
 
-document.addEventListener('keydown', (e) => console.log(e.code));
+// document.addEventListener('keydown', (e) => console.log(e.code));
