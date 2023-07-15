@@ -16,12 +16,12 @@ class InputController {
         if (!this.bindingGroups.has(groupName)) {
             this.bindingGroups.set(groupName, { isActive, inputSequences });
             inputSequences.forEach((inputSeq) => {
-                let inputs = inputSeq.getAllInputs();
-                inputs.forEach((input) => {
-                    if (!this.boundInputs.has(input)) {
-                        this.boundInputs.set(input, groupName);
+                let inputKeys = inputSeq.getAllInputKeys();
+                inputKeys.forEach((inputKey) => {
+                    if (!this.boundInputs.has(inputKey)) {
+                        this.boundInputs.set(inputKey, groupName);
                     } else {
-                        console.warn(`Attempted to overwrite ${input}`);
+                        console.warn(`Attempted to overwrite ${inputKey}`);
                     }
                 });
             });
@@ -30,17 +30,23 @@ class InputController {
         }
     }
 
-    static createBoundInputKey(event) {
-        return `${event.type} ${event.code}`;
+    static createBoundInputKey(type, code) {
+        return `${type} ${code}`;
     }
 
     static #getAssociatedInputGroup(event) {
-        let groupName = this.boundInputs.get(this.createBoundInputKey(event));
+        let groupName = this.boundInputs.get(
+            this.createBoundInputKey(event.type, event.code)
+        );
         return this.bindingGroups.get(groupName);
     }
 
     static handleKeyDown(event) {
-        if (this.boundInputs.has(this.createBoundInputKey(event))) {
+        if (
+            this.boundInputs.has(
+                this.createBoundInputKey(event.type, event.code)
+            )
+        ) {
             for (let inputSequence of this.#getAssociatedInputGroup(event)
                 .inputSequences) {
                 inputSequence.handleInput(event);
@@ -73,7 +79,7 @@ class InputSequence {
         let code = event.code;
         let nextInput = this.inputs[this.#inputStage];
         // If input matches expected next input in sequence
-        if (nextInput.code === code) {
+        if (nextInput.codeSet.has(code)) {
             if (nextInput.action) nextInput.action();
             this.#inputStage = loopInt(
                 0,
@@ -83,7 +89,7 @@ class InputSequence {
             // If next input not detected before timeout triggers, sequence will be reset
             this.#setNewInputTimeout(nextInput.timeout);
             // If user is pressing the first key in sequence more than once
-        } else if (this.inputs[0].code === code) {
+        } else if (this.inputs[0].codeSet.has(code)) {
             let firstInput = this.inputs[0];
             if (firstInput.action) firstInput.action();
             this.#inputStage = loopInt(0, this.inputs.length, 1);
@@ -104,8 +110,26 @@ class InputSequence {
         this.#inputStage = 0;
     }
 
-    getAllInputs() {
-        return this.inputs.map((e) => InputController.createBoundInputKey(e));
+    getAllInputKeys() {
+        let allInputKeys = [];
+        this.inputs.forEach((input) => {
+            input.codeSet.forEach((code) => {
+                if (input.type != 'hold')
+                    allInputKeys.push(
+                        InputController.createBoundInputKey(input.type, code)
+                    );
+                else {
+                    // 'hold' events need to hear about both keydown and keyup
+                    allInputKeys.push(
+                        InputController.createBoundInputKey('keydown', code)
+                    );
+                    allInputKeys.push(
+                        InputController.createBoundInputKey('keyup', code)
+                    );
+                }
+            });
+        });
+        return allInputKeys;
     }
 }
 
@@ -113,12 +137,12 @@ class KeyEvent {
     // type e.g. keydown, hold, keyup
     // action e.g. a function to call when the key event happens
     constructor(
-        code,
+        codeArray,
         type = 'keydown',
         action = null,
         timeout = standardInputTimeout
     ) {
-        this.code = code;
+        this.codeSet = new Set(codeArray);
         this.type = type;
         this.action = action;
         this.timeout = timeout;

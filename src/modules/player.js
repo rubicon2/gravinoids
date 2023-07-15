@@ -32,28 +32,28 @@ export default class Player {
         InputController.addBindingGroup(playerName, true, [
             new InputSequence([
                 new KeyEvent(
-                    this.keys.left,
+                    [this.keys.left],
                     'keydown',
                     this.turn.bind(this, -this.n_turningSpeed)
                 ),
             ]),
             new InputSequence([
                 new KeyEvent(
-                    this.keys.right,
+                    [this.keys.right],
                     'keydown',
                     this.turn.bind(this, this.n_turningSpeed)
                 ),
             ]),
             new InputSequence([
                 new KeyEvent(
-                    this.keys.up,
+                    [this.keys.up],
                     'keydown',
                     this.accelerate.bind(this, this.n_accelerationSpeed)
                 ),
             ]),
             new InputSequence([
                 new KeyEvent(
-                    this.keys.down,
+                    [this.keys.down],
                     'keydown',
                     this.decelerate.bind(this, this.n_accelerationSpeed)
                 ),

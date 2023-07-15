@@ -311,19 +311,21 @@ let p1 = Player.list[1];
 
 InputController.addBindingGroup('cheats', true, [
     new InputSequence([
-        new KeyEvent('Numpad8'),
-        new KeyEvent('Numpad2'),
-        new KeyEvent('Numpad4'),
-        new KeyEvent('Numpad6'),
+        new KeyEvent(['Numpad8']),
+        new KeyEvent(['Numpad2']),
+        new KeyEvent(['Numpad4']),
+        new KeyEvent(['Numpad6']),
         new KeyEvent(
-            'NumpadEnter',
+            ['NumpadEnter'],
             'keydown',
             () => (Gfx.layers.debug.isVisible = !Gfx.layers.debug.isVisible)
         ),
     ]),
     new InputSequence([
-        new KeyEvent('KeyP'),
-        new KeyEvent('KeyP', 'keydown', () => alert('Double press detected!')),
+        new KeyEvent(['KeyP', 'KeyO']),
+        new KeyEvent(['KeyP', 'KeyO'], 'keydown', () =>
+            alert('Double press detected!')
+        ),
     ]),
 ]);
 
