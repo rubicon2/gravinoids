@@ -247,67 +247,67 @@ let p1 = Player.list[1];
 // Input.addBinding(p1.keys.up, p1.accelerate.bind(p1, p1.n_accelerationSpeed));
 // Input.addBinding(p1.keys.down, p1.decelerate.bind(p1, p1.n_accelerationSpeed));
 
-InputController.addBindingGroup('playerOne', true, [
-    new InputSequence([
-        new KeyEvent(
-            p0.keys.left,
-            'keydown',
-            p0.turn.bind(p0, -p0.n_turningSpeed)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(
-            p0.keys.right,
-            'keydown',
-            p0.turn.bind(p0, p0.n_turningSpeed)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(
-            p0.keys.up,
-            'keydown',
-            p0.accelerate.bind(p0, p0.n_accelerationSpeed)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(
-            p0.keys.down,
-            'keydown',
-            p0.decelerate.bind(p0, p0.n_accelerationSpeed)
-        ),
-    ]),
-]);
+// InputController.addBindingGroup('playerOne', true, [
+//     new InputSequence([
+//         new KeyEvent(
+//             p0.keys.left,
+//             'keydown',
+//             p0.turn.bind(p0, -p0.n_turningSpeed)
+//         ),
+//     ]),
+//     new InputSequence([
+//         new KeyEvent(
+//             p0.keys.right,
+//             'keydown',
+//             p0.turn.bind(p0, p0.n_turningSpeed)
+//         ),
+//     ]),
+//     new InputSequence([
+//         new KeyEvent(
+//             p0.keys.up,
+//             'keydown',
+//             p0.accelerate.bind(p0, p0.n_accelerationSpeed)
+//         ),
+//     ]),
+//     new InputSequence([
+//         new KeyEvent(
+//             p0.keys.down,
+//             'keydown',
+//             p0.decelerate.bind(p0, p0.n_accelerationSpeed)
+//         ),
+//     ]),
+// ]);
 
-InputController.addBindingGroup('playerTwo', true, [
-    new InputSequence([
-        new KeyEvent(
-            p1.keys.left,
-            'keydown',
-            p1.turn.bind(p1, -p1.n_turningSpeed)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(
-            p1.keys.right,
-            'keydown',
-            p1.turn.bind(p1, p1.n_turningSpeed)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(
-            p1.keys.up,
-            'keydown',
-            p1.accelerate.bind(p1, p1.n_accelerationSpeed)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(
-            p1.keys.down,
-            'keydown',
-            p1.decelerate.bind(p1, p1.n_accelerationSpeed)
-        ),
-    ]),
-]);
+// InputController.addBindingGroup('playerTwo', true, [
+//     new InputSequence([
+//         new KeyEvent(
+//             p1.keys.left,
+//             'keydown',
+//             p1.turn.bind(p1, -p1.n_turningSpeed)
+//         ),
+//     ]),
+//     new InputSequence([
+//         new KeyEvent(
+//             p1.keys.right,
+//             'keydown',
+//             p1.turn.bind(p1, p1.n_turningSpeed)
+//         ),
+//     ]),
+//     new InputSequence([
+//         new KeyEvent(
+//             p1.keys.up,
+//             'keydown',
+//             p1.accelerate.bind(p1, p1.n_accelerationSpeed)
+//         ),
+//     ]),
+//     new InputSequence([
+//         new KeyEvent(
+//             p1.keys.down,
+//             'keydown',
+//             p1.decelerate.bind(p1, p1.n_accelerationSpeed)
+//         ),
+//     ]),
+// ]);
 
 InputController.addBindingGroup('cheats', true, [
     new InputSequence([

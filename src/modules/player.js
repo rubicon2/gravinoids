@@ -1,10 +1,10 @@
-import Transform from "./transform";
-import Rigidbody from "./rigidbody";
-import * as V2 from "./vectors";
-import { clamp } from "./util";
+import Transform from './transform';
+import Rigidbody from './rigidbody';
+import { InputController, InputSequence, KeyEvent } from './input';
+import * as V2 from './vectors';
+import { clamp } from './util';
 
 export default class Player {
-
     static list = [];
 
     color = undefined;
@@ -23,24 +23,75 @@ export default class Player {
         this.color = color;
         this.mesh = mesh;
         this.keys = keybindings;
+        this.initialiseInput();
         Player.list.push(this);
     }
 
+    initialiseInput() {
+        let playerName = `player_${Player.list.length}`;
+        InputController.addBindingGroup(playerName, true, [
+            new InputSequence([
+                new KeyEvent(
+                    this.keys.left,
+                    'keydown',
+                    this.turn.bind(this, -this.n_turningSpeed)
+                ),
+            ]),
+            new InputSequence([
+                new KeyEvent(
+                    this.keys.right,
+                    'keydown',
+                    this.turn.bind(this, this.n_turningSpeed)
+                ),
+            ]),
+            new InputSequence([
+                new KeyEvent(
+                    this.keys.up,
+                    'keydown',
+                    this.accelerate.bind(this, this.n_accelerationSpeed)
+                ),
+            ]),
+            new InputSequence([
+                new KeyEvent(
+                    this.keys.down,
+                    'keydown',
+                    this.decelerate.bind(this, this.n_accelerationSpeed)
+                ),
+            ]),
+        ]);
+    }
+
     accelerate(speed) {
-        this.rb.v2_velocity = V2.add(this.rb.v2_velocity, V2.rotate(V2.create(0, -speed), this.t.n_rotation));
+        this.rb.v2_velocity = V2.add(
+            this.rb.v2_velocity,
+            V2.rotate(V2.create(0, -speed), this.t.n_rotation)
+        );
         if (V2.magnitude(this.rb.v2_velocity) > this.n_maxVelocity) {
-            this.rb.v2_velocity = V2.scale(V2.normalize(this.rb.v2_velocity), this.n_maxVelocity);
+            this.rb.v2_velocity = V2.scale(
+                V2.normalize(this.rb.v2_velocity),
+                this.n_maxVelocity
+            );
         }
-    };
+    }
 
     decelerate(speed) {
-        this.rb.v2_velocity = V2.add(this.rb.v2_velocity, V2.rotate(V2.create(0, speed), this.t.n_rotation));
+        this.rb.v2_velocity = V2.add(
+            this.rb.v2_velocity,
+            V2.rotate(V2.create(0, speed), this.t.n_rotation)
+        );
         if (V2.magnitude(this.rb.v2_velocity) > this.n_maxVelocity) {
-            this.rb.v2_velocity = V2.scale(V2.normalize(this.rb.v2_velocity), this.n_maxVelocity);
+            this.rb.v2_velocity = V2.scale(
+                V2.normalize(this.rb.v2_velocity),
+                this.n_maxVelocity
+            );
         }
-    };
+    }
 
     turn(speed) {
-        this.rb.n_rotationSpeed = clamp(-this.n_maxAngularVelocity, this.n_maxAngularVelocity, this.rb.n_rotationSpeed += speed);
-    };
+        this.rb.n_rotationSpeed = clamp(
+            -this.n_maxAngularVelocity,
+            this.n_maxAngularVelocity,
+            (this.rb.n_rotationSpeed += speed)
+        );
+    }
 }
