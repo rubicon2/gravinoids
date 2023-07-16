@@ -57,7 +57,7 @@ class InputController {
     static handleKeyUp(event) {
         if (
             this.boundInputs.has(
-                this.createBoundInputKey(event.type, event.coded)
+                this.createBoundInputKey(event.type, event.code)
             )
         ) {
             for (let inputSequence of this.#getAssociatedInputGroup(event)
