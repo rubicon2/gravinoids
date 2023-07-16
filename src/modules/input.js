@@ -109,9 +109,9 @@ class InputSequence {
     #advanceInputStage() {
         let currentInputStage = this.inputs[this.#inputStage];
         if (currentInputStage.action) currentInputStage.action();
+        this.#setNewInputStageTimeout(currentInputStage.timeout);
         this.#inputStage = loopInt(0, this.inputs.length, this.#inputStage + 1);
         this.#inputSet.clear();
-        this.#setNewInputStageTimeout(nextInput.timeout);
     }
 
     #setNewInputStageTimeout(time) {
