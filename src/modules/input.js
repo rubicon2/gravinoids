@@ -112,7 +112,6 @@ class InputSequence {
                     if (this.#inputSet.has(code)) this.#inputSet.delete(code);
                     break;
             }
-            console.log(this.#inputSet);
         }
         // need to deal with any held inputs that are let go
         if (type === 'keyup' && this.#heldInput?.codeSet.has(code)) {
