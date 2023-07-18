@@ -85,17 +85,23 @@ class InputSequence {
         let code = event.code;
         let type = event.type;
 
-        this.expectedInput = this.inputs[this.#inputStage];
+        this.#expectedInput = this.inputs[this.#inputStage];
 
-        if (expectedInput.type === type) {
+        if (this.#expectedInput.type === type) {
             // i.e. keydown or keyup
-            if (expectedInput.codeSet.has(code)) this.#addToInputSet(code);
+            if (this.#expectedInput.codeSet.has(code))
+                this.#addToInputSet(code);
             else if (this.inputs[0].codeSet.has(code)) {
                 this.#resetInputStage();
                 this.#addToInputSet(code);
             }
-        } else if (expectedInput.type === 'hold') {
-            // 'hold' needs to deal with keydown and keyup events
+        } else if (this.#expectedInput.type === 'hold') {
+            // 'hold' needs to deal with keydown event only
+            if (this.#expectedInput.codeSet.has(code))
+                this.#addToInputSet(code);
+        }
+        // need to deal with any held inputs that are let go, regardless of next expected input
+        if (type === 'keyup' && this.#heldInput?.codeSet.has(code)) {
         }
     }
 
