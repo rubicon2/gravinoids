@@ -69,6 +69,7 @@ class InputController {
 }
 
 class InputSequence {
+    #expectedInput = null;
     #inputStage = 0;
     #inputSet = new Set();
     #inputStageTimeout = null;
@@ -84,7 +85,7 @@ class InputSequence {
         let code = event.code;
         let type = event.type;
 
-        let expectedInput = this.inputs[this.#inputStage];
+        this.expectedInput = this.inputs[this.#inputStage];
 
         if (expectedInput.type === type) {
             // i.e. keydown or keyup
@@ -99,19 +100,17 @@ class InputSequence {
     }
 
     #addToInputSet(code) {
-        let expectedInput = this.inputs[this.#inputStage];
         this.#inputSet.add(code);
-        if (expectedInput.codeSet.size === this.#inputSet.size) {
+        if (this.#expectedInput.codeSet.size === this.#inputSet.size) {
             this.#advanceInputStage();
         } else setTimeout(() => this.#inputSet.delete(code), inputSetTimeout);
     }
 
     #advanceInputStage() {
-        let currentInputStage = this.inputs[this.#inputStage];
-        if (currentInputStage.action) currentInputStage.action();
+        if (this.#expectedInput.action) this.#expectedInput.action();
+        this.#setNewInputStageTimeout(this.#expectedInput.timeout);
         this.#inputStage = loopInt(0, this.inputs.length, this.#inputStage + 1);
         this.#inputSet.clear();
-        this.#setNewInputStageTimeout(nextInput.timeout);
     }
 
     #setNewInputStageTimeout(time) {
