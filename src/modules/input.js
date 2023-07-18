@@ -130,7 +130,12 @@ class InputSequence {
                 if (this.#expectedInput.codeSet.size === this.#inputSet.size) {
                     // store heldInput and minInput stage - while these keys are held, if the sequence is broken it will not go below minStage
                     this.#heldInput = this.#expectedInput;
-                    this.#minInputStage = this.#inputStage + 1;
+                    // loop int, so if hold event is for some reason the last in a sequence, it will loop back to the first input in sequence instead of breaking
+                    this.#minInputStage = loopInt(
+                        0,
+                        this.inputs.length,
+                        this.#inputStage + 1
+                    );
                     this.#advanceInputStage();
                 }
                 break;

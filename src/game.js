@@ -242,6 +242,9 @@ InputController.addBindingGroup('cheats', true, [
         new KeyEvent(['KeyK'], 'keydown', () =>
             console.log('Hold then press detected!')
         ),
+        new KeyEvent(['KeyJ'], 'hold', () =>
+            console.log('Hold then press then hold detected!')
+        ),
     ]),
 ]);
 
