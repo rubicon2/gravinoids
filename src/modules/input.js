@@ -74,6 +74,9 @@ class InputSequence {
     #inputSet = new Set();
     #inputStageTimeout = null;
 
+    #minInputStage = 0;
+    #heldInput = null;
+
     // inputs e.g. an array of key events
     // onInputBreak e.g. a function triggered when sequence fails
     constructor(inputs, onInputBreak = null) {
@@ -91,31 +94,67 @@ class InputSequence {
             // i.e. keydown or keyup
             if (this.#expectedInput.codeSet.has(code))
                 this.#addToInputSet(code);
-            else if (this.inputs[0].codeSet.has(code)) {
+            else if (
+                this.inputs[0].tpye === type &&
+                this.inputs[0].codeSet.has(code)
+            ) {
                 this.#resetInputStage();
                 this.#addToInputSet(code);
             }
         } else if (this.#expectedInput.type === 'hold') {
-            // 'hold' needs to deal with keydown event only
-            if (this.#expectedInput.codeSet.has(code))
-                this.#addToInputSet(code);
+            // expected 'hold' input needs to deal with keydown and keyup
+            switch (type) {
+                case 'keydown':
+                    if (this.#expectedInput.codeSet.has(code))
+                        this.#addToInputSet(code);
+                    break;
+                case 'keyup':
+                    if (this.#inputSet.has(code)) this.#inputSet.delete(code);
+                    break;
+            }
+            console.log(this.#inputSet);
         }
-        // need to deal with any held inputs that are let go, regardless of next expected input
+        // need to deal with any held inputs that are let go
         if (type === 'keyup' && this.#heldInput?.codeSet.has(code)) {
+            this.#inputSet = new Set(this.#heldInput.codeSet);
+            this.#inputSet.delete(code);
+            this.#heldInput = null;
+            this.#inputStage = 0;
+            this.#minInputStage = 0;
         }
     }
 
     #addToInputSet(code) {
         this.#inputSet.add(code);
-        if (this.#expectedInput.codeSet.size === this.#inputSet.size) {
-            this.#advanceInputStage();
-        } else setTimeout(() => this.#inputSet.delete(code), inputSetTimeout);
+        switch (this.#expectedInput.type) {
+            case 'hold':
+                if (this.#expectedInput.codeSet.size === this.#inputSet.size) {
+                    // store heldInput and minInput stage - while these keys are held, if the sequence is broken it will not go below minStage
+                    this.#heldInput = this.#expectedInput;
+                    this.#minInputStage = this.#inputStage + 1;
+                    this.#advanceInputStage();
+                }
+                break;
+            default:
+                if (this.#expectedInput.codeSet.size === this.#inputSet.size)
+                    this.#advanceInputStage();
+                else
+                    setTimeout(
+                        () => this.#inputSet.delete(code),
+                        inputSetTimeout
+                    );
+        }
     }
 
     #advanceInputStage() {
         if (this.#expectedInput.action) this.#expectedInput.action();
-        this.#setNewInputStageTimeout(this.#expectedInput.timeout);
-        this.#inputStage = loopInt(0, this.inputs.length, this.#inputStage + 1);
+        if (this.#expectedInput.type !== 'hold')
+            this.#setNewInputStageTimeout(this.#expectedInput.timeout);
+        this.#inputStage = loopInt(
+            this.#minInputStage,
+            this.inputs.length,
+            this.#inputStage + 1
+        );
         this.#inputSet.clear();
     }
 
@@ -134,7 +173,7 @@ class InputSequence {
 
     #handleInputBreak() {
         if (this.onInputBreak) this.onInputBreak();
-        this.#inputStage = 0;
+        this.#inputStage = this.#minInputStage;
     }
 
     getAllInputKeys() {

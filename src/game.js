@@ -236,6 +236,13 @@ InputController.addBindingGroup('cheats', true, [
             alert('Simultaneous double press detected!')
         ),
     ]),
+    new InputSequence([
+        new KeyEvent(['KeyJ'], 'hold', () => console.log('Hold 1 detected!')),
+        new KeyEvent(['KeyL'], 'hold', () => console.log('Hold 2 detected!')),
+        new KeyEvent(['KeyK'], 'keydown', () =>
+            console.log('Hold then press detected!')
+        ),
+    ]),
 ]);
 
 // document.addEventListener('keydown', (e) => console.log(e.code));
