@@ -95,7 +95,7 @@ class InputSequence {
             if (this.#expectedInput.codeSet.has(code))
                 this.#addToInputSet(code);
             else if (
-                this.inputs[0].tpye === type &&
+                this.inputs[0].type === type &&
                 this.inputs[0].codeSet.has(code)
             ) {
                 this.#resetInputStage();
