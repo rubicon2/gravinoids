@@ -220,32 +220,45 @@ createPlayerDebugPanel(Player.list[0]);
 createPlayerDebugPanel(Player.list[1]);
 
 InputController.addBindingGroup('cheats', true, [
-    new InputSequence([
-        new KeyEvent(['Numpad8']),
-        new KeyEvent(['Numpad2']),
-        new KeyEvent(['Numpad4']),
-        new KeyEvent(['Numpad6']),
-        new KeyEvent(
-            ['NumpadEnter'],
-            'keydown',
-            () => (Gfx.layers.debug.isVisible = !Gfx.layers.debug.isVisible)
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(['KeyO', 'KeyP'], 'keydown', () =>
-            alert('Simultaneous double press detected!')
-        ),
-    ]),
-    new InputSequence([
-        new KeyEvent(['KeyJ'], 'hold', () => console.log('Hold 1 detected!')),
-        new KeyEvent(['KeyL'], 'hold', () => console.log('Hold 2 detected!')),
-        new KeyEvent(['KeyK'], 'keydown', () =>
-            console.log('Hold then press detected!')
-        ),
-        new KeyEvent(['KeyJ'], 'hold', () =>
-            console.log('Hold then press then hold detected!')
-        ),
-    ]),
+    new InputSequence(
+        [
+            new KeyEvent(['Numpad8']),
+            new KeyEvent(['Numpad2']),
+            new KeyEvent(['Numpad4']),
+            new KeyEvent(['Numpad6']),
+            new KeyEvent(
+                ['NumpadEnter'],
+                'keydown',
+                () => (Gfx.layers.debug.isVisible = !Gfx.layers.debug.isVisible)
+            ),
+        ],
+        () => alert('Failed to enter debug code!')
+    ),
+    new InputSequence(
+        [
+            new KeyEvent(['KeyO', 'KeyP'], 'keydown', () =>
+                alert('Simultaneous double press detected!')
+            ),
+        ],
+        () => alert('Simulteanous input break!')
+    ),
+    new InputSequence(
+        [
+            new KeyEvent(['KeyJ'], 'hold', () =>
+                console.log('Hold 1 detected!')
+            ),
+            new KeyEvent(['KeyL'], 'hold', () =>
+                console.log('Hold 2 detected!')
+            ),
+            new KeyEvent(['KeyK'], 'keydown', () =>
+                console.log('Hold then press detected!')
+            ),
+            new KeyEvent(['KeyJ'], 'hold', () =>
+                console.log('Hold then press then hold detected!')
+            ),
+        ],
+        () => alert('Long sequence input break!!!')
+    ),
 ]);
 
 // document.addEventListener('keydown', (e) => console.log(e.code));
