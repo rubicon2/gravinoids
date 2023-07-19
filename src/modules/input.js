@@ -98,7 +98,8 @@ class InputSequence {
                 this.inputs[0].type === type &&
                 this.inputs[0].codeSet.has(code)
             ) {
-                this.#resetInputStage();
+                this.#inputStage = 0;
+                this.#inputSet.clear();
                 this.#addToInputSet(code);
             }
         } else if (this.#expectedInput.type === 'hold') {
@@ -152,8 +153,13 @@ class InputSequence {
 
     #advanceInputStage() {
         if (this.#expectedInput.action) this.#expectedInput.action();
+        // if current input stage is not hold type, and we have not just completed the sequence,
+        // set off input stage timeout - if next input is not hit before timeout expires, handleInputBreak occurs
         if (this.#expectedInput.type !== 'hold')
             this.#setNewInputStageTimeout(this.#expectedInput.timeout);
+        // if we have reached the end of the sequence, cancel any remaining timeouts
+        if (this.#inputStage >= this.inputs.length - 1)
+            clearTimeout(this.#inputStageTimeout);
         this.#inputStage = loopInt(
             this.#minInputStage,
             this.inputs.length,
@@ -168,11 +174,6 @@ class InputSequence {
             this.#handleInputBreak.bind(this),
             time
         );
-    }
-
-    #resetInputStage() {
-        this.#inputStage = 0;
-        this.#inputSet.clear();
     }
 
     #handleInputBreak() {
