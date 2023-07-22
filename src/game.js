@@ -231,11 +231,6 @@ InputController.addBindingGroup('cheats', true, [
             () => (Gfx.layers.debug.isVisible = !Gfx.layers.debug.isVisible)
         ),
     ]),
-    new InputSequence([
-        new KeyEvent(['KeyO', 'KeyP'], 'keydown', () =>
-            alert('Simultaneous double press detected!')
-        ),
-    ]),
 ]);
 
 // document.addEventListener('keydown', (e) => console.log(e.code));
