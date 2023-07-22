@@ -11,8 +11,8 @@ export default class Player {
     mesh = undefined;
     keybindings = undefined;
 
-    n_accelerationSpeed = 0.3;
-    n_turningSpeed = 0.2;
+    n_accelerationSpeed = 0.2;
+    n_turningSpeed = 0.25;
 
     n_maxVelocity = 10;
     n_maxAngularVelocity = 6;
@@ -33,29 +33,47 @@ export default class Player {
             new InputSequence([
                 new KeyEvent(
                     [this.keys.left],
-                    'keydown',
+                    'hold',
                     this.turn.bind(this, -this.n_turningSpeed)
                 ),
             ]),
             new InputSequence([
                 new KeyEvent(
                     [this.keys.right],
-                    'keydown',
+                    'hold',
                     this.turn.bind(this, this.n_turningSpeed)
                 ),
             ]),
             new InputSequence([
                 new KeyEvent(
                     [this.keys.up],
-                    'keydown',
+                    'hold',
                     this.accelerate.bind(this, this.n_accelerationSpeed)
                 ),
             ]),
             new InputSequence([
                 new KeyEvent(
                     [this.keys.down],
-                    'keydown',
+                    'hold',
                     this.decelerate.bind(this, this.n_accelerationSpeed)
+                ),
+            ]),
+            new InputSequence([
+                new KeyEvent(
+                    [this.keys.left, this.keys.right],
+                    'hold',
+                    () => (this.rb.n_rotationSpeed *= 0.9)
+                ),
+            ]),
+            new InputSequence([
+                new KeyEvent(
+                    [this.keys.up, this.keys.down],
+                    'hold',
+                    () =>
+                        (this.rb.v2_velocity = V2.scale(
+                            this.rb.v2_velocity,
+                            0.9
+                        ))
                 ),
             ]),
         ]);

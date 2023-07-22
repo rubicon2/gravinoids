@@ -6,11 +6,14 @@ const fastInputTimeout = 500;
 
 const inputSetTimeout = 20;
 
+const repeatInterval = 100;
+
 class InputController {
     // Points the way for the key event to the correct binding group
     static boundInputs = new Map();
     // E.g. each player has their own group
     static bindingGroups = new Map();
+    static repeatingActions = new Set();
 
     static addBindingGroup(groupName, isActive, inputSequences) {
         if (!this.bindingGroups.has(groupName)) {
@@ -66,7 +69,21 @@ class InputController {
             }
         }
     }
+
+    static runRepeatingActions() {
+        // any held inputs with actions will be called
+        // when they are pressed, and then repeatedly until the key is let go
+
+        // it makes more sense to have this on each input sequence itself, but...
+        // having an interval being called per input sequence would be less efficient than
+        // having one interval on the input controller?? Riiight?
+        InputController.repeatingActions?.forEach((action) => {
+            action();
+        });
+    }
 }
+
+setInterval(InputController.runRepeatingActions, repeatInterval);
 
 class InputSequence {
     #expectedInput = null;
@@ -115,13 +132,8 @@ class InputSequence {
             }
         }
         // need to deal with any held inputs that are let go
-        if (type === 'keyup' && this.#heldInput?.codeSet.has(code)) {
-            this.#inputSet = new Set(this.#heldInput.codeSet);
-            this.#inputSet.delete(code);
-            this.#heldInput = null;
-            this.#inputStage = 0;
-            this.#minInputStage = 0;
-        }
+        if (type === 'keyup' && this.#heldInput?.codeSet.has(code))
+            this.#cancelHeldInput(code);
     }
 
     #addToInputSet(code) {
@@ -151,12 +163,28 @@ class InputSequence {
         }
     }
 
+    #cancelHeldInput(code) {
+        InputController.repeatingActions.delete(this.#heldInput.action);
+        this.#inputSet = new Set(this.#heldInput.codeSet);
+        this.#inputSet.delete(code);
+        this.#heldInput = null;
+        this.#inputStage = 0;
+        this.#minInputStage = 0;
+    }
+
     #advanceInputStage() {
-        if (this.#expectedInput.action) this.#expectedInput.action();
         // if current input stage is not hold type, and we have not just completed the sequence,
         // set off input stage timeout - if next input is not hit before timeout expires, handleInputBreak occurs
-        if (this.#expectedInput.type !== 'hold')
+        this.#expectedInput.action?.();
+        if (this.#expectedInput.type !== 'hold') {
             this.#setNewInputStageTimeout(this.#expectedInput.timeout);
+        } else {
+            if (this.#expectedInput.action != null)
+                InputController.repeatingActions.add(
+                    this.#expectedInput.action
+                );
+            console.log(InputController.repeatingActions);
+        }
         // if we have reached the end of the sequence, cancel any remaining timeouts
         if (this.#inputStage >= this.inputs.length - 1)
             clearTimeout(this.#inputStageTimeout);
