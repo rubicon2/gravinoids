@@ -13,7 +13,6 @@ class InputController {
     static boundInputs = new Map();
     // E.g. each player has their own group
     static bindingGroups = new Map();
-    static repeatingActions = new Set();
 
     static addBindingGroup(groupName, isActive, inputSequences) {
         if (!this.bindingGroups.has(groupName)) {
@@ -69,21 +68,7 @@ class InputController {
             }
         }
     }
-
-    static runRepeatingActions() {
-        // any held inputs with actions will be called
-        // when they are pressed, and then repeatedly until the key is let go
-
-        // it makes more sense to have this on each input sequence itself, but...
-        // having an interval being called per input sequence would be less efficient than
-        // having one interval on the input controller?? Riiight?
-        InputController.repeatingActions?.forEach((action) => {
-            action();
-        });
-    }
 }
-
-setInterval(InputController.runRepeatingActions, repeatInterval);
 
 class InputSequence {
     #expectedInput = null;
@@ -93,6 +78,7 @@ class InputSequence {
 
     #minInputStage = 0;
     #heldInput = null;
+    #heldInputInterval = null;
 
     // inputs e.g. an array of key events
     // onInputBreak e.g. a function triggered when sequence fails
@@ -164,7 +150,7 @@ class InputSequence {
     }
 
     #cancelHeldInput(code) {
-        InputController.repeatingActions.delete(this.#heldInput.action);
+        clearInterval(this.#heldInputInterval);
         this.#inputSet = new Set(this.#heldInput.codeSet);
         this.#inputSet.delete(code);
         this.#heldInput = null;
@@ -180,8 +166,9 @@ class InputSequence {
             this.#setNewInputStageTimeout(this.#expectedInput.timeout);
         } else {
             if (this.#expectedInput.action != null)
-                InputController.repeatingActions.add(
-                    this.#expectedInput.action
+                this.#heldInputInterval = setInterval(
+                    this.#expectedInput.action,
+                    repeatInterval
                 );
             console.log(InputController.repeatingActions);
         }
