@@ -1,6 +1,9 @@
 import Transform from './transform';
 import Rigidbody from './rigidbody';
-import { InputController, InputSequence, KeyEvent } from './input';
+// import { InputController, InputSequence, KeyEvent } from './input/input';
+import InputController from './input/inputcontroller';
+import InputSequence from './input/inputsequence';
+import KeyEvent from './input/keyevent';
 import * as V2 from './vectors';
 import { clamp } from './util';
 
@@ -17,14 +20,16 @@ export default class Player {
     n_maxVelocity = 10;
     n_maxAngularVelocity = 6;
 
-    constructor(color, x, y, mesh, keybindings) {
+    constructor(color, x, y, mesh, collisionMesh, keybindings) {
         this.t = new Transform(V2.create(x, y), 0, V2.one);
-        this.rb = new Rigidbody(this.t, true);
+        this.rb = new Rigidbody(this.t, collisionMesh, true);
         this.color = color;
         this.mesh = mesh;
         this.keys = keybindings;
         this.initialiseInput();
         Player.list.push(this);
+
+        // Publish onNewPlayer event??
     }
 
     initialiseInput() {

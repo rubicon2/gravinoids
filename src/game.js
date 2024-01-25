@@ -5,7 +5,9 @@ import * as V2 from './modules/vectors';
 import * as Gfx from './modules/graphics';
 import { publish } from './modules/pubsub';
 
-import { InputController, InputSequence, KeyEvent } from './modules/input';
+import InputController from './modules/input/inputcontroller';
+import InputSequence from './modules/input/inputsequence';
+import KeyEvent from './modules/input/keyevent';
 
 import Rigidbody from './modules/rigidbody';
 import Player from './modules/player';
@@ -62,6 +64,21 @@ let shipMeshes = [
     ]),
 ];
 
+let shipCollisionMeshes = [
+    new Gfx.Mesh([
+        V2.create(-12, 12),
+        V2.create(0, -24),
+        V2.create(12, 12),
+        V2.create(0, 0)
+    ]),
+    new Gfx.Mesh([
+        V2.create(-12, 12),
+        V2.create(0, -24),
+        V2.create(12, 12),
+        V2.create(0, 0)
+    ])
+]
+
 function createRGBA(r, g, b, a) {
     return {
         r: Util.clamp(0, 255, r),
@@ -98,6 +115,7 @@ function createPlayers(playerCount) {
                 center.x * 0.5,
                 center.y * 0.5,
                 shipMeshes[1],
+                shipCollisionMeshes[1],
                 defaultKeys[3]
             );
         case 3:
@@ -106,6 +124,7 @@ function createPlayers(playerCount) {
                 center.x * 1.5,
                 center.y * 1.5,
                 shipMeshes[0],
+                shipCollisionMeshes[0],
                 defaultKeys[2]
             );
         case 2:
@@ -114,6 +133,7 @@ function createPlayers(playerCount) {
                 center.x * 1.5,
                 center.y * 0.5,
                 shipMeshes[1],
+                shipCollisionMeshes[1],
                 defaultKeys[1]
             );
         default:
@@ -122,6 +142,7 @@ function createPlayers(playerCount) {
                 center.x * 0.5,
                 center.y * 1.5,
                 shipMeshes[0],
+                shipCollisionMeshes[0],
                 defaultKeys[0]
             );
     }
