@@ -10,18 +10,18 @@ const repeatInterval = 100;
 
 class InputController {
     // Points the way for the key event to the correct binding group
-    static boundInputs = new Map();
+    static #boundInputs = new Map();
     // E.g. each player has their own group
-    static bindingGroups = new Map();
+    static #bindingGroups = new Map();
 
     static addBindingGroup(groupName, isActive, inputSequences) {
-        if (!this.bindingGroups.has(groupName)) {
-            this.bindingGroups.set(groupName, { isActive, inputSequences });
+        if (!this.#bindingGroups.has(groupName)) {
+            this.#bindingGroups.set(groupName, { isActive, inputSequences });
             inputSequences.forEach((inputSeq) => {
                 let inputKeys = inputSeq.getAllInputKeys();
                 inputKeys.forEach((inputKey) => {
-                    if (!this.boundInputs.has(inputKey)) {
-                        this.boundInputs.set(inputKey, groupName);
+                    if (!this.#boundInputs.has(inputKey)) {
+                        this.#boundInputs.set(inputKey, groupName);
                     } else {
                         console.warn(`Attempted to overwrite ${inputKey}`);
                     }
@@ -37,15 +37,15 @@ class InputController {
     }
 
     static #getAssociatedInputGroup(event) {
-        let groupName = this.boundInputs.get(
+        let groupName = this.#boundInputs.get(
             this.createBoundInputKey(event.type, event.code)
         );
-        return this.bindingGroups.get(groupName);
+        return this.#bindingGroups.get(groupName);
     }
 
     static handleKeyDown(event) {
         if (
-            this.boundInputs.has(
+            this.#boundInputs.has(
                 this.createBoundInputKey(event.type, event.code)
             )
         ) {
@@ -58,7 +58,7 @@ class InputController {
 
     static handleKeyUp(event) {
         if (
-            this.boundInputs.has(
+            this.#boundInputs.has(
                 this.createBoundInputKey(event.type, event.code)
             )
         ) {
