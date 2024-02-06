@@ -66,18 +66,30 @@ let shipMeshes = [
 
 let shipCollisionMeshes = [
     new Gfx.Mesh([
-        V2.create(-12, 12),
-        V2.create(0, -24),
-        V2.create(12, 12),
-        V2.create(0, 0)
+        new Gfx.Polygon(
+            [
+                V2.create(-12, 12),
+                V2.create(0, -24),
+                V2.create(12, 12),
+                V2.create(0, 0)
+            ],
+            'white',
+            false
+            )
     ]),
     new Gfx.Mesh([
-        V2.create(-12, 12),
-        V2.create(0, -24),
-        V2.create(12, 12),
-        V2.create(0, 0)
+        new Gfx.Polygon(
+            [
+                V2.create(-12, 12),
+                V2.create(0, -24),
+                V2.create(12, 12),
+                V2.create(0, 0)
+            ],
+            'white',
+            false
+        )
     ])
-]
+];
 
 function createRGBA(r, g, b, a) {
     return {

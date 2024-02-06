@@ -1,11 +1,13 @@
 import * as V2 from "./vectors";
 import * as Util from "./util";
+import { publish } from './pubsub';
 
 export default class Rigidbody {
 
     static list = [];
 
     transform = undefined;
+    collisionMesh = undefined;
     v2_velocity = V2.zero;
     n_rotationSpeed = 0;
     v2_acceleration = V2.zero;
@@ -14,10 +16,13 @@ export default class Rigidbody {
     bounciness = 0;
     collisionEnabled = true;
 
-    constructor(transform, collisionEnabled) {
+    constructor(transform, collisionMesh, collisionEnabled) {
         this.transform = transform;
+        this.collisionMesh = collisionMesh;
         this.collisionEnabled = collisionEnabled;
         Rigidbody.list.push(this);
+
+        publish('onNewRigidbody', this);
     };
 
     update() {

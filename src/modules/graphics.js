@@ -1,5 +1,5 @@
 import * as V2 from "./vectors";
-import { publish } from "./pubsub";
+import { subscribe, publish } from "./pubsub";
 
 let canvas = null;
 let ctx = null;
@@ -27,8 +27,18 @@ let layers = {
     background: new RenderLayer(0, "background", true),
     game: new RenderLayer(1, "game", true),
     ui: new RenderLayer(2, "ui", true),
-    debug: new RenderLayer(3, "debug", true)
+    debug: new RenderLayer(3, "debug", true),
 }
+
+function addRigibodyDebug(rigidbody) {
+    addToRenderList(new RenderItem(
+        rigidbody.transform, 
+        { mesh: rigidbody.collisionMesh }, 
+        layers.debug, 
+        true));
+}
+
+subscribe('onNewRigidbody', addRigibodyDebug);
 
 class RenderItem {
     constructor(transform, renderContent, renderLayer = layers.game, isVisible = true) {
