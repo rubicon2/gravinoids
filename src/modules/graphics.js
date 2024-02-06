@@ -54,9 +54,10 @@ class Mesh {
 }
 
 class Polygon {
-    constructor(vertexArray, color) {
+    constructor(vertexArray, color, isColorFill = true) {
         this.vertexArray = vertexArray;
         this.color = color;
+        this.isColorFill = isColorFill;
     }
     scaled(v2_scale) {
         let scaledVertexArray = [];
@@ -64,7 +65,7 @@ class Polygon {
             let scaledVertex = V2.create(v.x * v2_scale.x, v.y * v2_scale.y);
             scaledVertexArray.push(scaledVertex);
         }
-        return new Polygon(scaledVertexArray, this.color);
+        return new Polygon(scaledVertexArray, this.color, this.isColorFill);
     }
 }
 
@@ -128,6 +129,7 @@ const renderMesh = function(renderItem) {
         let vertexes = p.vertexArray;
         let currentVertex = vertexes[0];
         ctx.fillStyle = p.color;
+        ctx.strokeStyle = p.color;
 
         ctx.beginPath();
         ctx.moveTo(currentVertex.x * scale, currentVertex.y * scale);
@@ -139,7 +141,9 @@ const renderMesh = function(renderItem) {
         }
 
         ctx.closePath();
-        ctx.fill();
+
+        if (p.isColorFill) ctx.fill();
+        else ctx.stroke();
     }
 
     for(let p of scaledMesh.polygons) {
