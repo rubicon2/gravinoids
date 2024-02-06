@@ -1,6 +1,5 @@
 import Transform from './transform';
 import Rigidbody from './rigidbody';
-// import { InputController, InputSequence, KeyEvent } from './input/input';
 import InputController from './input/inputcontroller';
 import InputSequence from './input/inputsequence';
 import KeyEvent from './input/keyevent';
