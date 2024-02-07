@@ -12,6 +12,8 @@ import KeyEvent from './modules/input/keyevent';
 
 import Rigidbody from './modules/rigidbody';
 import Player from './modules/player';
+import Mesh from './modules/graphics/mesh';
+import Polygon from './modules/graphics/polygon';
 import Transform from './modules/transform';
 
 let defaultKeys = [
@@ -32,8 +34,8 @@ let defaultKeys = [
 ];
 
 let shipMeshes = [
-    new Gfx.Mesh([
-        new Gfx.Polygon(
+    new Mesh([
+        new Polygon(
             [
                 V2.create(-12, 12),
                 V2.create(0, -24),
@@ -43,8 +45,8 @@ let shipMeshes = [
             'yellow'
         ),
     ]),
-    new Gfx.Mesh([
-        new Gfx.Polygon(
+    new Mesh([
+        new Polygon(
             [
                 V2.create(-12, 12),
                 V2.create(0, -24),
@@ -53,7 +55,7 @@ let shipMeshes = [
             ],
             'red'
         ),
-        new Gfx.Polygon(
+        new Polygon(
             [
                 V2.create(-12, 12),
                 V2.create(0, -5),
@@ -66,8 +68,8 @@ let shipMeshes = [
 ];
 
 let shipCollisionMeshes = [
-    new Gfx.Mesh([
-        new Gfx.Polygon(
+    new Mesh([
+        new Polygon(
             [
                 V2.create(-12, 12),
                 V2.create(0, -24),
@@ -78,8 +80,8 @@ let shipCollisionMeshes = [
             false
         ),
     ]),
-    new Gfx.Mesh([
-        new Gfx.Polygon(
+    new Mesh([
+        new Polygon(
             [
                 V2.create(-12, 12),
                 V2.create(0, -24),

@@ -3,6 +3,7 @@ import { subscribe, publish } from './pubsub';
 import RenderLayer from './graphics/renderlayer';
 import RenderItem from './graphics/renderitem';
 import Polygon from './graphics/polygon';
+import Mesh from './graphics/mesh';
 
 let canvas = null;
 let ctx = null;
@@ -37,20 +38,6 @@ function addRigibodyDebug(rigidbody) {
 }
 
 subscribe('onNewRigidbody', addRigibodyDebug);
-
-class Mesh {
-    constructor(polygons) {
-        this.polygons = polygons;
-    }
-    scaled(v2_scale) {
-        let scaledPolygons = [];
-        // Why is polygons not iterable?
-        for (let p of this.polygons) {
-            scaledPolygons.push(p.scaled(v2_scale));
-        }
-        return new Mesh(scaledPolygons);
-    }
-}
 
 const createCanvas = function () {
     canvas = document.createElement('canvas');
@@ -201,8 +188,6 @@ const renderScene2D = function () {
 };
 
 export {
-    Mesh,
-    Polygon,
     layers,
     getCanvasSize,
     getCenter,
