@@ -1,6 +1,7 @@
 import * as V2 from './vectors';
 import { subscribe, publish } from './pubsub';
 import RenderLayer from './graphics/renderlayer';
+import RenderItem from './graphics/renderitem';
 
 let canvas = null;
 let ctx = null;
@@ -35,20 +36,6 @@ function addRigibodyDebug(rigidbody) {
 }
 
 subscribe('onNewRigidbody', addRigibodyDebug);
-
-class RenderItem {
-    constructor(
-        transform,
-        renderContent,
-        renderLayer = layers.game,
-        isVisible = true
-    ) {
-        this.transform = transform;
-        this.content = renderContent;
-        this.layer = renderLayer;
-        this.isVisible = isVisible;
-    }
-}
 
 class Mesh {
     constructor(polygons) {
@@ -229,7 +216,6 @@ const renderScene2D = function () {
 };
 
 export {
-    RenderItem,
     Mesh,
     Polygon,
     layers,

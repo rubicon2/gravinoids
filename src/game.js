@@ -3,6 +3,7 @@ require('./styles.css');
 import * as Util from './modules/util';
 import * as V2 from './modules/vectors';
 import * as Gfx from './modules/graphics';
+import RenderItem from './modules/graphics/renderitem';
 import { publish } from './modules/pubsub';
 
 import InputController from './modules/input/inputcontroller';
@@ -71,11 +72,11 @@ let shipCollisionMeshes = [
                 V2.create(-12, 12),
                 V2.create(0, -24),
                 V2.create(12, 12),
-                V2.create(0, 0)
+                V2.create(0, 0),
             ],
             'white',
             false
-            )
+        ),
     ]),
     new Gfx.Mesh([
         new Gfx.Polygon(
@@ -83,12 +84,12 @@ let shipCollisionMeshes = [
                 V2.create(-12, 12),
                 V2.create(0, -24),
                 V2.create(12, 12),
-                V2.create(0, 0)
+                V2.create(0, 0),
             ],
             'white',
             false
-        )
-    ])
+        ),
+    ]),
 ];
 
 function createRGBA(r, g, b, a) {
@@ -195,7 +196,7 @@ function createPlayerDebugPanel(player) {
 
     const lineGap = 25;
 
-    let positionInfo = new Gfx.RenderItem(
+    let positionInfo = new RenderItem(
         new Transform(V2.zero, 0, V2.one, t_debugPanel),
         {
             text: () => {
@@ -206,7 +207,7 @@ function createPlayerDebugPanel(player) {
         },
         Gfx.layers.debug
     );
-    let velocityInfo = new Gfx.RenderItem(
+    let velocityInfo = new RenderItem(
         new Transform(V2.create(0, lineGap), 0, V2.one, t_debugPanel),
         {
             text: () => {
@@ -218,7 +219,7 @@ function createPlayerDebugPanel(player) {
         },
         Gfx.layers.debug
     );
-    let rotationInfo = new Gfx.RenderItem(
+    let rotationInfo = new RenderItem(
         new Transform(V2.create(0, lineGap * 2), 0, V2.one, t_debugPanel),
         {
             text: () => {
@@ -227,7 +228,7 @@ function createPlayerDebugPanel(player) {
         },
         Gfx.layers.debug
     );
-    let rotationSpeedInfo = new Gfx.RenderItem(
+    let rotationSpeedInfo = new RenderItem(
         new Transform(V2.create(0, lineGap * 3), 0, V2.one, t_debugPanel),
         {
             text: () => {
@@ -244,10 +245,18 @@ function createPlayerDebugPanel(player) {
 }
 
 Gfx.addToRenderList(
-    new Gfx.RenderItem(Player.list[0].t, { mesh: Player.list[0].mesh })
+    new RenderItem(
+        Player.list[0].t,
+        { mesh: Player.list[0].mesh },
+        Gfx.layers.game
+    )
 );
 Gfx.addToRenderList(
-    new Gfx.RenderItem(Player.list[1].t, { mesh: Player.list[1].mesh })
+    new RenderItem(
+        Player.list[1].t,
+        { mesh: Player.list[1].mesh },
+        Gfx.layers.game
+    )
 );
 createPlayerDebugPanel(Player.list[0]);
 createPlayerDebugPanel(Player.list[1]);
