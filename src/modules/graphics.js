@@ -2,6 +2,7 @@ import * as V2 from './vectors';
 import { subscribe, publish } from './pubsub';
 import RenderLayer from './graphics/renderlayer';
 import RenderItem from './graphics/renderitem';
+import Polygon from './graphics/polygon';
 
 let canvas = null;
 let ctx = null;
@@ -48,22 +49,6 @@ class Mesh {
             scaledPolygons.push(p.scaled(v2_scale));
         }
         return new Mesh(scaledPolygons);
-    }
-}
-
-class Polygon {
-    constructor(vertexArray, color, isColorFill = true) {
-        this.vertexArray = vertexArray;
-        this.color = color;
-        this.isColorFill = isColorFill;
-    }
-    scaled(v2_scale) {
-        let scaledVertexArray = [];
-        for (let v of this.vertexArray) {
-            let scaledVertex = V2.create(v.x * v2_scale.x, v.y * v2_scale.y);
-            scaledVertexArray.push(scaledVertex);
-        }
-        return new Polygon(scaledVertexArray, this.color, this.isColorFill);
     }
 }
 
