@@ -1,9 +1,7 @@
 import * as V2 from './vectors';
 import { subscribe, publish } from './pubsub';
 import RenderLayer from './graphics/renderlayer';
-import RenderItem from './graphics/renderitem';
-import Polygon from './graphics/polygon';
-import Mesh from './graphics/mesh';
+import { RenderMesh } from './graphics/renderitem';
 
 let canvas = null;
 let ctx = null;
@@ -12,12 +10,6 @@ let v2_center = V2.zero;
 let scale = window.devicePixelRatio;
 
 let renderList = [];
-
-let defaultTextStyle = {
-    font: '24px Arial',
-    strokeStyle: 'white',
-    fillStyle: 'white',
-};
 
 let layers = {
     background: new RenderLayer(0, 'background', true),
@@ -28,9 +20,9 @@ let layers = {
 
 function addRigibodyDebug(rigidbody) {
     addToRenderList(
-        new RenderItem(
+        new RenderMesh(
             rigidbody.transform,
-            { mesh: rigidbody.collisionMesh },
+            rigidbody.collisionMesh,
             layers.debug,
             true
         )
@@ -81,84 +73,6 @@ const removeFromRenderList = function (renderItem) {
     publish('onRenderListChange', renderList);
 };
 
-const renderMesh = function (renderItem) {
-    let transform = renderItem.transform;
-    let mesh = renderItem.content.mesh;
-
-    ctx.save();
-
-    ctx.translate(transform.v2_position.x, transform.v2_position.y);
-    ctx.rotate(V2.degToRad(transform.n_rotation));
-
-    let scaledMesh = mesh.scaled(transform.v2_scale);
-
-    function renderPolygon(p) {
-        let vertexes = p.vertexArray;
-        let currentVertex = vertexes[0];
-        ctx.fillStyle = p.color;
-        ctx.strokeStyle = p.color;
-
-        ctx.beginPath();
-        ctx.moveTo(currentVertex.x * scale, currentVertex.y * scale);
-
-        // Skip first vertex as we already moved to that position
-        for (let i = 1; i < vertexes.length; i++) {
-            currentVertex = vertexes[i];
-            ctx.lineTo(currentVertex.x * scale, currentVertex.y * scale);
-        }
-
-        ctx.closePath();
-
-        if (p.isColorFill) ctx.fill();
-        else ctx.stroke();
-    }
-
-    for (let p of scaledMesh.polygons) {
-        renderPolygon(p);
-    }
-
-    ctx.restore();
-};
-
-const renderText = function (renderItem) {
-    let transform = renderItem.transform;
-    let content = renderItem.content;
-
-    let text = 'empty string';
-    if (typeof content.text === 'function') text = content.text();
-    else text = content.text;
-
-    ctx.save();
-    ctx.translate(transform.v2_position.x, transform.v2_position.y);
-    ctx.rotate(V2.degToRad(transform.n_rotation));
-
-    ctx.strokeStyle =
-        content.strokeStyle != undefined
-            ? content.strokeStyle
-            : defaultTextStyle.strokeStyle;
-    ctx.fillStyle =
-        content.fillStyle != undefined
-            ? content.fillStyle
-            : defaultTextStyle.fillStyle;
-    ctx.font = content.font != undefined ? content.font : defaultTextStyle.font;
-
-    ctx.fillText(`${text}`, 0, 0);
-
-    ctx.restore();
-};
-
-const renderRenderItem = function (renderItem) {
-    let content = renderItem.content;
-    if (content.text != undefined) {
-        renderText(renderItem);
-    } else if (content.mesh != undefined) {
-        renderMesh(renderItem);
-    } else {
-        console.error(`RenderItem has no valid content to render.`);
-        console.error(new Error().stack);
-    }
-};
-
 const renderScene2D = function () {
     // Filter renderList by visible layers only
     let visibleOnly = renderList.filter(function (e) {
@@ -170,20 +84,10 @@ const renderScene2D = function () {
         return a.layer.renderOrder > b.layer.renderOrder;
     });
 
-    // Sort into renderLayer order
-    // renderList.sort(function(a, b) {
-    //     return a.layer.renderOrder > b.layer.renderOrder;
-    // });
-
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-
-    // Go through all items in "renderList" and call the appropriate function to draw it, depending on the content
-    // for (let renderItem of renderList) {
-    //     renderRenderItem(renderItem);
-    // }
-
     for (let renderItem of visibleOnly) {
-        renderRenderItem(renderItem);
+        // renderRenderItem(renderItem);
+        renderItem.draw(ctx, scale);
     }
 };
 

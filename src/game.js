@@ -3,7 +3,12 @@ require('./styles.css');
 import * as Util from './modules/util';
 import * as V2 from './modules/vectors';
 import * as Gfx from './modules/graphics';
-import RenderItem from './modules/graphics/renderitem';
+// import RenderItem from './modules/graphics/renderitem';
+import {
+    RenderMesh,
+    RenderText,
+    RenderTextInfo,
+} from './modules/graphics/renderitem';
 import { publish } from './modules/pubsub';
 
 import InputController from './modules/input/inputcontroller';
@@ -198,45 +203,37 @@ function createPlayerDebugPanel(player) {
 
     const lineGap = 25;
 
-    let positionInfo = new RenderItem(
+    let positionInfo = new RenderText(
         new Transform(V2.zero, 0, V2.one, t_debugPanel),
-        {
-            text: () => {
-                return `x: ${Math.round(
-                    player.t.v2_position.x
-                )}, y: ${Math.round(player.t.v2_position.y)}`;
-            },
-        },
+        new RenderTextInfo(() => {
+            return `x: ${Math.round(player.t.v2_position.x)}, y: ${Math.round(
+                player.t.v2_position.y
+            )}`;
+        }),
         Gfx.layers.debug
     );
-    let velocityInfo = new RenderItem(
+    let velocityInfo = new RenderText(
         new Transform(V2.create(0, lineGap), 0, V2.one, t_debugPanel),
-        {
-            text: () => {
-                return `vx: ${Util.roundTo(
-                    player.rb.v2_velocity.x,
-                    2
-                )}, vy: ${Util.roundTo(player.rb.v2_velocity.y, 2)}`;
-            },
-        },
+        new RenderTextInfo(() => {
+            return `vx: ${Util.roundTo(
+                player.rb.v2_velocity.x,
+                2
+            )}, vy: ${Util.roundTo(player.rb.v2_velocity.y, 2)}`;
+        }),
         Gfx.layers.debug
     );
-    let rotationInfo = new RenderItem(
+    let rotationInfo = new RenderText(
         new Transform(V2.create(0, lineGap * 2), 0, V2.one, t_debugPanel),
-        {
-            text: () => {
-                return `r: ${Math.round(player.t.n_rotation)}`;
-            },
-        },
+        new RenderTextInfo(() => {
+            return `r: ${Math.round(player.t.n_rotation)}`;
+        }),
         Gfx.layers.debug
     );
-    let rotationSpeedInfo = new RenderItem(
+    let rotationSpeedInfo = new RenderText(
         new Transform(V2.create(0, lineGap * 3), 0, V2.one, t_debugPanel),
-        {
-            text: () => {
-                return `rs: ${Util.roundTo(player.rb.n_rotationSpeed, 2)}`;
-            },
-        },
+        new RenderTextInfo(() => {
+            return `rs: ${Util.roundTo(player.rb.n_rotationSpeed, 2)}`;
+        }),
         Gfx.layers.debug
     );
 
@@ -247,18 +244,10 @@ function createPlayerDebugPanel(player) {
 }
 
 Gfx.addToRenderList(
-    new RenderItem(
-        Player.list[0].t,
-        { mesh: Player.list[0].mesh },
-        Gfx.layers.game
-    )
+    new RenderMesh(Player.list[0].t, Player.list[0].mesh, Gfx.layers.game)
 );
 Gfx.addToRenderList(
-    new RenderItem(
-        Player.list[1].t,
-        { mesh: Player.list[1].mesh },
-        Gfx.layers.game
-    )
+    new RenderMesh(Player.list[1].t, Player.list[1].mesh, Gfx.layers.game)
 );
 createPlayerDebugPanel(Player.list[0]);
 createPlayerDebugPanel(Player.list[1]);
@@ -276,5 +265,3 @@ InputController.addBindingGroup('cheats', true, [
         ),
     ]),
 ]);
-
-// document.addEventListener('keydown', (e) => console.log(e.code));
