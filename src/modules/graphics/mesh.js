@@ -11,4 +11,12 @@ export default class Mesh {
         }
         return new Mesh(scaledPolygons);
     }
+
+    getVertices() {
+        const allVertices = [];
+        this.polygons.forEach((p) => {
+            allVertices.push(...p.vertexArray);
+        });
+        return allVertices;
+    }
 }

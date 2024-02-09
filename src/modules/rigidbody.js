@@ -1,9 +1,8 @@
-import * as V2 from "./vectors";
-import * as Util from "./util";
+import * as V2 from './vectors';
+import * as Util from './util';
 import { publish } from './pubsub';
 
 export default class Rigidbody {
-
     static list = [];
 
     transform = undefined;
@@ -23,11 +22,26 @@ export default class Rigidbody {
         Rigidbody.list.push(this);
 
         publish('onNewRigidbody', this);
-    };
+    }
+
+    getWorldSpaceCollisionVertices() {
+        return this.collisionMesh
+            .scaled(this.transform.v2_scale)
+            .getVertices()
+            .map((v) => V2.rotate(v, this.transform.n_rotation))
+            .map((v) => V2.add(v, this.transform.v2_position));
+    }
 
     update() {
         this.v2_velocity = V2.add(this.v2_velocity, this.v2_acceleration);
-        this.transform.v2_localPosition = V2.add(this.transform.v2_position, this.v2_velocity);
-        this.transform.n_localRotation = Util.loopNumber(0, 360, this.transform.n_rotation + this.n_rotationSpeed);
-    };
+        this.transform.v2_localPosition = V2.add(
+            this.transform.v2_position,
+            this.v2_velocity
+        );
+        this.transform.n_localRotation = Util.loopNumber(
+            0,
+            360,
+            this.transform.n_rotation + this.n_rotationSpeed
+        );
+    }
 }
