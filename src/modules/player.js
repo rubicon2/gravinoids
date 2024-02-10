@@ -19,9 +19,9 @@ export default class Player {
     n_maxVelocity = 10;
     n_maxAngularVelocity = 6;
 
-    constructor(color, x, y, mesh, collisionMesh, keybindings) {
+    constructor(color, x, y, mesh, collisionPolygon, keybindings) {
         this.t = new Transform(V2.create(x, y), 0, V2.one);
-        this.rb = new Rigidbody(this.t, collisionMesh, true);
+        this.rb = new Rigidbody(this.t, collisionPolygon, true, true);
         this.color = color;
         this.mesh = mesh;
         this.keys = keybindings;

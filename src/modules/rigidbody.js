@@ -16,10 +16,11 @@ export default class Rigidbody {
     bounciness = 0;
     collisionEnabled = true;
 
-    constructor(transform, collisionPolygon, collisionEnabled) {
+    constructor(transform, collisionPolygon, collisionEnabled, physicsEnabled) {
         this.transform = transform;
         this.collisionPolygon = collisionPolygon;
         this.collisionEnabled = collisionEnabled;
+        this.physicsEnabled = physicsEnabled;
         Rigidbody.list.push(this);
 
         publish('onNewRigidbody', this);
