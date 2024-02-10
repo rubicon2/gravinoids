@@ -72,31 +72,27 @@ let shipMeshes = [
     ]),
 ];
 
-let shipCollisionMeshes = [
-    new Mesh([
-        new Polygon(
-            [
-                V2.create(-12, 12),
-                V2.create(0, -24),
-                V2.create(12, 12),
-                V2.create(0, 0),
-            ],
-            'white',
-            false
-        ),
-    ]),
-    new Mesh([
-        new Polygon(
-            [
-                V2.create(-12, 12),
-                V2.create(0, -24),
-                V2.create(12, 12),
-                V2.create(0, 0),
-            ],
-            'white',
-            false
-        ),
-    ]),
+let shipCollisionPolygons = [
+    new Polygon(
+        [
+            V2.create(-12, 12),
+            V2.create(0, -24),
+            V2.create(12, 12),
+            V2.create(0, 0),
+        ],
+        'white',
+        false
+    ),
+    new Polygon(
+        [
+            V2.create(-12, 12),
+            V2.create(0, -24),
+            V2.create(12, 12),
+            V2.create(0, 0),
+        ],
+        'white',
+        false
+    ),
 ];
 
 function createRGBA(r, g, b, a) {
@@ -135,7 +131,7 @@ function createPlayers(playerCount) {
                 center.x * 0.5,
                 center.y * 0.5,
                 shipMeshes[1],
-                shipCollisionMeshes[1],
+                shipCollisionPolygons[1],
                 defaultKeys[3]
             );
         case 3:
@@ -144,7 +140,7 @@ function createPlayers(playerCount) {
                 center.x * 1.5,
                 center.y * 1.5,
                 shipMeshes[0],
-                shipCollisionMeshes[0],
+                shipCollisionPolygons[0],
                 defaultKeys[2]
             );
         case 2:
@@ -153,7 +149,7 @@ function createPlayers(playerCount) {
                 center.x * 1.5,
                 center.y * 0.5,
                 shipMeshes[1],
-                shipCollisionMeshes[1],
+                shipCollisionPolygons[1],
                 defaultKeys[1]
             );
         default:
@@ -162,7 +158,7 @@ function createPlayers(playerCount) {
                 center.x * 0.5,
                 center.y * 1.5,
                 shipMeshes[0],
-                shipCollisionMeshes[0],
+                shipCollisionPolygons[0],
                 defaultKeys[0]
             );
     }

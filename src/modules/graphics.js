@@ -2,6 +2,8 @@ import * as V2 from './vectors';
 import { subscribe, publish } from './pubsub';
 import RenderLayer from './graphics/renderlayer';
 import { RenderMesh } from './graphics/renderitem';
+import Mesh from './graphics/mesh';
+import Transform from './transform';
 
 let canvas = null;
 let ctx = null;
@@ -18,18 +20,18 @@ let layers = {
     debug: new RenderLayer(3, 'debug', true),
 };
 
+// New mesh doesn't update position of vertices in line with original object
+// As new mesh is a separate object! Not reference.
 function addRigibodyDebug(rigidbody) {
     addToRenderList(
         new RenderMesh(
-            rigidbody.transform,
-            rigidbody.collisionMesh,
+            new Transform(V2.zero, 0, V2.one),
+            new Mesh([rigidbody.getWorldSpaceCollisionPolygon()]),
             layers.debug,
             true
         )
     );
 }
-
-subscribe('onNewRigidbody', addRigibodyDebug);
 
 const createCanvas = function () {
     canvas = document.createElement('canvas');
@@ -98,6 +100,7 @@ export {
     createCanvas,
     setCanvasSize,
     addToRenderList,
+    addRigibodyDebug,
     removeFromRenderList,
     renderScene2D,
 };

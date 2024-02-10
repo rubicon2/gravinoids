@@ -1,6 +1,7 @@
 import * as V2 from './vectors';
 import * as Util from './util';
 import { publish } from './pubsub';
+import Polygon from './graphics/polygon';
 
 export default class Rigidbody {
     static list = [];
@@ -15,9 +16,9 @@ export default class Rigidbody {
     bounciness = 0;
     collisionEnabled = true;
 
-    constructor(transform, collisionMesh, collisionEnabled) {
+    constructor(transform, collisionPolygon, collisionEnabled) {
         this.transform = transform;
-        this.collisionMesh = collisionMesh;
+        this.collisionPolygon = collisionPolygon;
         this.collisionEnabled = collisionEnabled;
         Rigidbody.list.push(this);
 
@@ -25,11 +26,18 @@ export default class Rigidbody {
     }
 
     getWorldSpaceCollisionVertices() {
-        return this.collisionMesh
+        return this.collisionPolygon
             .scaled(this.transform.v2_scale)
-            .getVertices()
-            .map((v) => V2.rotate(v, this.transform.n_rotation))
+            .vertexArray.map((v) => V2.rotate(v, this.transform.n_rotation))
             .map((v) => V2.add(v, this.transform.v2_position));
+    }
+
+    getWorldSpaceCollisionPolygon() {
+        return new Polygon(
+            this.getWorldSpaceCollisionVertices(),
+            'white',
+            false
+        );
     }
 
     update() {
