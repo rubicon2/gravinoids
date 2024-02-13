@@ -15,7 +15,7 @@ import InputController from './modules/input/inputcontroller';
 import InputSequence from './modules/input/inputsequence';
 import KeyEvent from './modules/input/keyevent';
 
-import Rigidbody from './modules/rigidbody';
+import Rigidbody from './modules/physics/rigidbody';
 import Player from './modules/player';
 import Mesh from './modules/graphics/mesh';
 import Polygon from './modules/graphics/polygon';
@@ -35,6 +35,20 @@ let defaultKeys = [
         down: 'ArrowDown',
         right: 'ArrowRight',
         action: 'ShiftRight',
+    },
+    {
+        up: 'KeyI',
+        left: 'KeyJ',
+        down: 'KeyK',
+        right: 'KeyL',
+        action: 'Space',
+    },
+    {
+        up: 'Numpad8',
+        left: 'Numpad4',
+        down: 'Numpad5',
+        right: 'Numpad6',
+        action: 'Numpad0',
     },
 ];
 
@@ -245,19 +259,33 @@ Gfx.addToRenderList(
 Gfx.addToRenderList(
     new RenderMesh(Player.list[1].t, Player.list[1].mesh, Gfx.layers.game)
 );
+// Gfx.addToRenderList(
+//     new RenderMesh(Player.list[2].t, Player.list[2].mesh, Gfx.layers.game)
+// );
+// Gfx.addToRenderList(
+//     new RenderMesh(Player.list[3].t, Player.list[3].mesh, Gfx.layers.game)
+// );
 createPlayerDebugPanel(Player.list[0]);
 createPlayerDebugPanel(Player.list[1]);
+// createPlayerDebugPanel(Player.list[2]);
+// createPlayerDebugPanel(Player.list[3]);
 
 InputController.addBindingGroup('cheats', true, [
     new InputSequence([
-        new KeyEvent(['Numpad8']),
-        new KeyEvent(['Numpad2']),
-        new KeyEvent(['Numpad4']),
-        new KeyEvent(['Numpad6']),
+        new KeyEvent(['Backquote']),
         new KeyEvent(
-            ['NumpadEnter'],
+            ['Enter'],
             'keydown',
             () => (Gfx.layers.debug.isVisible = !Gfx.layers.debug.isVisible)
         ),
     ]),
 ]);
+
+// setInterval(() => {
+//     const worldSpacePolygon = Player.list[0].rb.getWorldSpaceCollisionPolygon();
+//     console.log(worldSpacePolygon.vertexArray);
+//     // Gfx.addRigibodyDebug(Player.list[0].rb);
+// }, 100);
+document.addEventListener('keypress', (e) => {
+    console.log(e.code);
+});

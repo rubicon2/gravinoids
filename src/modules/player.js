@@ -1,5 +1,5 @@
 import Transform from './transform';
-import Rigidbody from './rigidbody';
+import Rigidbody from './physics/rigidbody';
 import InputController from './input/inputcontroller';
 import InputSequence from './input/inputsequence';
 import KeyEvent from './input/keyevent';
