@@ -3,7 +3,6 @@ require('./styles.css');
 import * as Util from './modules/util';
 import * as V2 from './modules/vectors';
 import * as Gfx from './modules/graphics';
-// import RenderItem from './modules/graphics/renderitem';
 import {
     RenderMesh,
     RenderText,
@@ -280,12 +279,3 @@ InputController.addBindingGroup('cheats', true, [
         ),
     ]),
 ]);
-
-// setInterval(() => {
-//     const worldSpacePolygon = Player.list[0].rb.getWorldSpaceCollisionPolygon();
-//     console.log(worldSpacePolygon.vertexArray);
-//     // Gfx.addRigibodyDebug(Player.list[0].rb);
-// }, 100);
-document.addEventListener('keypress', (e) => {
-    console.log(e.code);
-});
