@@ -56,10 +56,18 @@ export default class Rigidbody {
                     collisions.push({ location: v, collider: other });
             }
         }
-        if (collisions.length) console.log(collisions);
+        return collisions;
     }
 
-    resolveCollisions(collisionArray) {}
+    resolveCollisions(collisionArray) {
+        for (let collision of collisionArray) {
+            const location = collision.location;
+            const collider = collision.collider;
+            // Demo collision response
+            this.v2_velocity.x *= -1;
+            this.v2_velocity.y *= -1;
+        }
+    }
 
     update() {
         if (this.collisionEnabled) {
